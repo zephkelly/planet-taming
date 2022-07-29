@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public PlayerStateManager stateMachine = new PlayerStateManager();
+
     private Rigidbody2D rigidPlayer;
     private Transform transformPlayer;
 
-    private Vector2 inputs;
+    public Vector2 inputs;
     private float inputX;
     private float inputY;
 
@@ -21,15 +23,19 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 8f;
     public float attackLength = 2f;
 
-    void Start()    {
+    public void Start()  {
         rigidPlayer = this.GetComponent<Rigidbody2D>();
         transformPlayer = this.GetComponent<Transform>();
+
+        stateMachine.ChangeState(new PlayerIdleState(this));
     }
 
-    void Update()   {
+    public void Update()   {
         inputX = Input.GetAxisRaw("Horizontal");
         inputY = Input.GetAxisRaw("Vertical");
         inputs = new Vector2(inputX, inputY);
+
+        if (inputs != Vector2.zero) stateMachine.ChangeState(new PlayerMoveState(this));
 
         //Get mouse position relative to world and find direction from player
         mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -37,8 +43,10 @@ public class PlayerController : MonoBehaviour
         attackDirection.z = 0f;
         attackDirection.Normalize();
 
-        if (seeRay) { Debug.DrawRay(transformPlayer.position, attackDirection * attackLength, Color.red); }
+        stateMachine.SMUpdate();
 
+        if (seeRay) { Debug.DrawRay(transformPlayer.position, attackDirection * attackLength, Color.red); }
+        
         //Shoot a raycast on Mobs layer mask
         if (Input.GetMouseButtonDown(0)) {
             isAttacking = true;
@@ -54,7 +62,9 @@ public class PlayerController : MonoBehaviour
         else { isAttacking = false; }
     }
 
-    void FixedUpdate()   {
+    public void FixedUpdate()   {
+        stateMachine.SMFixedUpdate();
+
         rigidPlayer.velocity = inputs.normalized * moveSpeed;
     }
 }

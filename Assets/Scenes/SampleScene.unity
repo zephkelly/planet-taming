@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 152814114}
   - component: {fileID: 152814117}
   - component: {fileID: 152814116}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Collidable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1674,7 +1674,7 @@ GameObject:
   - component: {fileID: 400848779}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1712,7 +1712,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9c57260db1214f45ab6a79739874e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mousePos: {x: 0, y: 0, z: 0}
+  attackDirection: {x: 0, y: 0, z: 0}
+  attackLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  seeRay: 1
+  isAttacking: 0
   moveSpeed: 7
+  attackLength: 2
 --- !u!212 &400848774
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1808,7 +1816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f83cbe9eb27e1604a962e3bd81afa5da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 400848774}
   maxHealth: 100
   currentHealth: 0
 --- !u!70 &400848778
@@ -2125,7 +2133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1481499677}
   - component: {fileID: 1481499676}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Tilemap Stage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2175,7 +2183,7 @@ GameObject:
   - component: {fileID: 2069971435}
   - component: {fileID: 2069971434}
   - component: {fileID: 2069971439}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Slime
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -2194,7 +2202,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a2ea3e265132e54596291af17cb89c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  maxHealth: 50
+  currentHealth: 0
+  attackDamage: 10
 --- !u!58 &2069971435
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -2330,7 +2340,7 @@ GameObject:
   - component: {fileID: 2095049697}
   - component: {fileID: 2095049699}
   - component: {fileID: 2095049698}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
