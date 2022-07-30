@@ -2,23 +2,29 @@ using UnityEngine;
 
 public class PlayerIdleState : IState
 {
-    public PlayerIdleState(PlayerController controller)  {
-        Debug.Log("Entering Idle State");
+    private PlayerController controller;
+    private float maxIdleTimer = 10f;
+    private float currentIdleTimer;
+    bool activateIdleAnimation;
+
+    public PlayerIdleState(PlayerController c)  { controller = c; }
+
+    public void Entry()  {
+        Debug.Log("Entering Idle State"); 
+    
+        currentIdleTimer = maxIdleTimer;
     }
 
-    public void Entry()
-    {
+    public void Update()  {
+        if (controller.inputs != Vector2.zero) { controller.stateMachine.ChangeState(new PlayerMoveState(controller)); }
+        
+        if (currentIdleTimer <= 0)  {
+            activateIdleAnimation = true;
+            return;
+        } currentIdleTimer -= Time.deltaTime;     
     }
 
-    public void Update()  
-    {
-    }
+    public void FixedUpdate()  { }
 
-    public void FixedUpdate()
-    {
-    }
-
-    public void Exit()
-    {
-    }
+    public void Exit()  { }
 }

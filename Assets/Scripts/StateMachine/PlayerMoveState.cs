@@ -9,20 +9,17 @@ public class PlayerMoveState : IState
         controller = c;
     }
 
-    public void Entry()
-    {
+    public void Entry()  { }
+
+    public void Update()  {
+        if (controller.inputs == Vector2.zero) {
+            controller.stateMachine.ChangeState(new PlayerIdleState(controller));
+        }
     }
 
-    public void Update()  
-    {
-        if (controller.inputs == Vector2.zero) controller.stateMachine.ChangeState(new PlayerIdleState(controller));
+    public void FixedUpdate()  {
+        controller.rigidPlayer.velocity = controller.inputs.normalized * controller.moveSpeed;
     }
 
-    public void FixedUpdate()
-    {
-    }
-
-    public void Exit()
-    {
-    }
+    public void Exit()  { }
 }

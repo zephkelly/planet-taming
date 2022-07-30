@@ -13,21 +13,21 @@ public class PlayerStateManager
     IState currentState;
 
     public void ChangeState(IState newState)  {
-        if (currentState != null) { currentState.Exit(); }
+        if (currentState != null) currentState.Exit();
 
         currentState = newState;
         currentState.Entry();
     }
 
     public void SMUpdate()  {
-        if (currentState == null) { return; }
+        if (currentState == null) return;
 
         currentState.Update();
     }
 
-        public void SMFixedUpdate()  {
-        if (currentState == null) { return; }
-
-        currentState.Update();
+    public void SMFixedUpdate()  {
+        if (currentState == null) return;
+        
+        currentState.FixedUpdate();
     }
 }
