@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public GameObject slimePrefab;
+
     public PlayerStateManager stateMachine = new PlayerStateManager();
     public Rigidbody2D rigidPlayer;
     public Transform transformPlayer;
@@ -55,6 +57,11 @@ public class PlayerController : MonoBehaviour
         else { isAttacking = false; }
 
         if (seeRay) Debug.DrawRay(transformPlayer.position, attackDirection * attackLength, Color.red);
+
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            Debug.Log("Make Slime");
+            Instantiate(slimePrefab, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
+        }
     }
 
     public void FixedUpdate()  { stateMachine.SMFixedUpdate(); }

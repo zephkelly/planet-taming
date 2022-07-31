@@ -6,7 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     public int maxHealth = 50;
     public int currentHealth;
-    public int attackDamage = 10;
+    public int attackDamage = 20;
 
     void Start () {
         currentHealth = maxHealth;
@@ -14,11 +14,18 @@ public class EnemyController : MonoBehaviour
 
     public void TakeDamage(int damage) {
         currentHealth -= damage;
-        Debug.Log("Slime took damage. Current health: " + currentHealth);
+        
+        StartCoroutine(FlashRed());
 
         if (currentHealth <= 0) {
             Debug.Log("Slime ded");
-            currentHealth = maxHealth;
+            Destroy(this.gameObject);
         }
+    }
+
+    IEnumerator FlashRed() {
+        GetComponent<SpriteRenderer>().color = Color.red;
+        yield return new WaitForSeconds(0.2f);
+        GetComponent<SpriteRenderer>().color = Color.white;
     }
 }

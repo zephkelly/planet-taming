@@ -12,16 +12,17 @@ public class CameraFollow : MonoBehaviour{
         target = GameObject.Find("Player").transform;
     }
 
-    public void Update() {
-        targetVector = new Vector3(target.position.x, target.position.y, -10);
-        this.transform.position = Vector3.Lerp(this.transform.position, targetVector, smoothSpeed);
+    public void Update()
+    {
+        if (target != null) 
+        {
+            targetVector = new Vector3(target.position.x, target.position.y, -10);
+            this.transform.position = Vector3.Lerp(this.transform.position, targetVector, smoothSpeed);
+        }
     }
 
-    public void ChangeFocus(Transform newTarget) {
+    public void ChangeFocus(Transform newTarget)
+    {
         target = newTarget;
-    }
-
-    public void FocusDefault() {
-        target = GameObject.Find("Player").transform;
     }
 }
