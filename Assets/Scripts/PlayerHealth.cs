@@ -4,45 +4,45 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public GameplayManager gameplayManager;
-    public SpriteRenderer spriteRenderer;
+  public GameplayManager gameplayManager;
+  public SpriteRenderer spriteRenderer;
 
-    public int maxHealth = 100;
-    public int currentHealth;
+  public int maxHealth = 100;
+  public int currentHealth;
 
-    public void Start () 
+  public void Start ()
+  {
+    gameplayManager = GameObject.FindGameObjectWithTag("PersistentManager").GetComponent<GameplayManager>();
+
+    currentHealth = maxHealth;
+  }
+
+  private void OnTriggerEnter2D(Collider2D entity)
+  {
+    if (entity.gameObject.tag == "Enemy")
     {
-        gameplayManager = GameObject.FindGameObjectWithTag("PersistentManager").GetComponent<GameplayManager>();
-
-        currentHealth = maxHealth;
+      Debug.Log("Player took damage. Current health: " + currentHealth);
+      TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
     }
+  }
 
-    private void OnTriggerEnter2D(Collider2D entity) 
+  public void TakeDamage (int damage)
+  {
+    currentHealth -= damage;
+
+    if (currentHealth <= 0)
     {
-        if (entity.gameObject.tag == "Enemy") 
-        {
-            TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
-            Debug.Log("Player took damage. Current health: " + currentHealth);
-        }
+      Debug.Log("Player is dead");
+      gameplayManager.RespawnPlayer(this.gameObject);
     }
+  
+    StartCoroutine(FlashRed());
+  }
 
-    public void TakeDamage (int damage) 
-    { 
-        currentHealth -= damage;
-
-        if (currentHealth <= 0) 
-        { 
-            Debug.Log("Player is dead");
-            gameplayManager.RespawnPlayer(this.gameObject);
-        }
-        
-        StartCoroutine(FlashRed());
-    }
-
-    IEnumerator FlashRed() 
-    {
-        spriteRenderer.color = Color.red;
-        yield return new WaitForSeconds(0.2f);
-        spriteRenderer.color = Color.white;
-    }
+  IEnumerator FlashRed()
+  {
+    spriteRenderer.color = Color.red;
+    yield return new WaitForSeconds(0.2f);
+    spriteRenderer.color = Color.white;
+  }
 }

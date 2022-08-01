@@ -8,26 +8,38 @@ public interface IState
     void Exit();
 }
 
-public class PlayerStateManager  
+public class PlayerStateManager
 {
-    IState currentState;
+  IState currentState;
 
-    public void ChangeState(IState newState)  {
-        if (currentState != null) currentState.Exit();
-
-        currentState = newState;
-        currentState.Entry();
+  public void ChangeState(IState newState)
+  {
+    if (currentState != null)
+    {
+      currentState.Exit();
     }
 
-    public void SMUpdate()  {
-        if (currentState == null) return;
+    currentState = newState;
+    currentState.Entry();
+  }
 
-        currentState.Update();
+  public void SMUpdate()
+  {
+    if (currentState == null)
+    {
+      return;
     }
 
-    public void SMFixedUpdate()  {
-        if (currentState == null) return;
-        
-        currentState.FixedUpdate();
+    currentState.Update();
+  }
+
+  public void SMFixedUpdate()
+  {
+    if (currentState == null)
+    {
+      return;
     }
+
+    currentState.FixedUpdate();
+  }
 }
