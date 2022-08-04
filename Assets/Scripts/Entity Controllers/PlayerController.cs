@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
   [SerializeField] private Collider2D weaponTrigger;
 
   public Rigidbody2D rigidPlayer;
+  private Animator animatorPlayer;
   private Transform transformPlayer;
   private Vector3 attackDirection;
   private Vector3 mousePos;
@@ -28,9 +29,10 @@ public class PlayerController : MonoBehaviour
 
   public void Awake()
   {
-    rigidPlayer = this.GetComponent<Rigidbody2D>();
-    transformPlayer = this.GetComponent<Transform>();
     healthManager = this.GetComponent<PlayerHealthManager>();
+    transformPlayer = this.GetComponent<Transform>();
+    rigidPlayer = this.GetComponent<Rigidbody2D>();
+    animatorPlayer = this.GetComponent<Animator>();
   }
   
   public void Start()
@@ -41,17 +43,8 @@ public class PlayerController : MonoBehaviour
 
   public void Update()
   {
-    inputX = Input.GetAxisRaw("Horizontal");
-    inputY = Input.GetAxisRaw("Vertical");
-    inputs = new Vector2(inputX, inputY);
-
-    mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    attackDirection = mousePos - transformPlayer.position;
-    attackDirection.z = 0f;
-    attackDirection.Normalize();
-
-    //Update current state after input calculations
-    stateMachine.SMUpdate();
+    UpdateInputs();
+    stateMachine.SMUpdate(); //Update current state after input calculations
 
     //Attack legacy GARB refactor plzz
     if (Input.GetKey(KeyCode.E))
@@ -64,6 +57,28 @@ public class PlayerController : MonoBehaviour
     {
       Debug.Log("Make Slime");
       Instantiate(slimePrefab, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
+    }
+  }
+
+  public void UpdateInputs()
+  {
+    inputX = Input.GetAxisRaw("Horizontal");
+    inputY = Input.GetAxisRaw("Vertical");
+    inputs = new Vector2(inputX, inputY);
+
+    mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    attackDirection = mousePos - transformPlayer.position;
+    attackDirection.z = 0f;
+    attackDirection.Normalize();
+
+    //Update animator
+    animatorPlayer.SetFloat("inputX", inputX);
+    animatorPlayer.SetFloat("inputY", inputY);
+
+    if (inputs != Vector2.zero)
+    {
+      animatorPlayer.SetFloat("lastX", inputX);
+      animatorPlayer.SetFloat("lastY", inputY);
     }
   }
 
