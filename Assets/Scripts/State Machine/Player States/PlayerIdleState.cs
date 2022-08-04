@@ -14,7 +14,6 @@ public class PlayerIdleState : IState
 
   public void Entry()
   {
-    Debug.Log("Entering Idle State");
     currentIdleTimer = maxIdleTimer;
   }
 

@@ -20,10 +20,10 @@ public class PlayerController : MonoBehaviour
   private float inputY;
 
   public float moveSpeed = 8f;
-  public int attackDamage = 10;
-  //[SerializeField] float attackLength = 2f;
-
   public int maxHealth = 100;
+  public int attackDamage = 10;
+  private float attackWaitTimer = 0f;
+  private float damageWaitTimer = 0f;
 
   [SerializeField] GameObject slimePrefab; //temp
 
@@ -44,11 +44,18 @@ public class PlayerController : MonoBehaviour
   public void Update()
   {
     UpdateInputs();
-    stateMachine.SMUpdate(); //Update current state after input calculations
+    stateMachine.SMUpdate();
 
-    //Attack legacy GARB refactor plzz
-    if (Input.GetKey(KeyCode.E))
+    if (attackWaitTimer > 0 || damageWaitTimer > 0) 
     {
+      attackWaitTimer -= Time.deltaTime;
+      damageWaitTimer -= Time.deltaTime;
+    }
+
+    if (Input.GetMouseButtonDown(0) && attackWaitTimer <= 0)
+    {
+      Debug.Log("Attacking...");
+      attackWaitTimer = 0.5f;
       StartCoroutine(Attack());
     }
 
@@ -60,10 +67,15 @@ public class PlayerController : MonoBehaviour
     }
   }
 
+  public void FixedUpdate()
+  {
+    stateMachine.SMFixedUpdate();
+  }
+
   public void UpdateInputs()
   {
-    inputX = Input.GetAxisRaw("Horizontal");
     inputY = Input.GetAxisRaw("Vertical");
+    inputX = Input.GetAxisRaw("Horizontal");
     inputs = new Vector2(inputX, inputY);
 
     mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -85,23 +97,18 @@ public class PlayerController : MonoBehaviour
   IEnumerator Attack() 
   {
     weaponTrigger.enabled = true;
-    yield return new WaitForSeconds(0.2f);
+    yield return new WaitForSeconds(0.3f);
     weaponTrigger.enabled = false;
-    yield return new WaitForSeconds(0.8f);
   }
 
-  public void FixedUpdate()
-  {
-    stateMachine.SMFixedUpdate();
-  }
 
   //Needs a cooldown!! Coroutine it up boi
   public void OnCollisionEnter2D(Collision2D entity)
   {
-    if (entity.gameObject.tag == "Enemy")
+    if (entity.gameObject.tag == "Enemy" && damageWaitTimer <= 0)
     {
+      damageWaitTimer = 0.5f;
       healthManager.TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
-      Debug.Log("Player took damage. Current health: " + healthManager.Health);
     }
   }
 }

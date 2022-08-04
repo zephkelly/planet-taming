@@ -11,7 +11,6 @@ public class PlayerMoveState : IState
 
   public void Entry()
   {
-    Debug.Log("Entering Move State");
   }
 
   public void Update()

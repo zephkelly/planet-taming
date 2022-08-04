@@ -35,7 +35,7 @@ public class EnemyHealthManager : MonoBehaviour
     IEnumerator FlashRed()
     {
       spriteRenderer.color = Color.red;
-      yield return new WaitForSeconds(0.8f);
+      yield return new WaitForSeconds(0.4f);
       spriteRenderer.color = Color.white;
     }
   }

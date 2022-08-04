@@ -12,6 +12,8 @@ public class EnemyController : MonoBehaviour
   public int attackDamage = 10; //change 
   public int maxHealth = 50;
 
+  private float damageWaitTimer = 0f;
+
   public void Awake ()
   {
     enemyRigidbody = gameObject.GetComponent<Rigidbody2D>();
@@ -24,16 +26,24 @@ public class EnemyController : MonoBehaviour
     stateMachine.ChangeState(new SlimeIdleState(this));
   }
 
-  public void OnTriggerEnter2D(Collider2D collider)
+  public void Update ()
   {
-    if (collider.tag == "Player")
+    stateMachine.SMUpdate();
+
+    if (damageWaitTimer > 0) 
     {
-      healthManager.TakeDamage(collider.GetComponent<PlayerController>().attackDamage);
-      Debug.Log("Slime took damage. Current health: " + healthManager.Health);
+      damageWaitTimer -= Time.deltaTime;
     }
   }
 
-  public void Update () { stateMachine.SMUpdate(); }
+  public void OnTriggerEnter2D(Collider2D collider)
+  {
+    if (collider.tag == "Player" && damageWaitTimer <= 0)
+    {
+      damageWaitTimer = 0.5f;
+      healthManager.TakeDamage(collider.GetComponent<PlayerController>().attackDamage);
+    }
+  }
 
   public void FixedUpdate() { stateMachine.SMFixedUpdate(); }
 }
