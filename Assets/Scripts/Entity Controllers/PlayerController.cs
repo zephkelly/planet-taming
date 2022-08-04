@@ -5,9 +5,11 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
   public StateManager stateMachine = new StateManager();
+  public PlayerHealthManager healthManager;
+
+  [SerializeField] private Collider2D weaponTrigger;
 
   public Rigidbody2D rigidPlayer;
-  [SerializeField] LayerMask attackLayer;
   private Transform transformPlayer;
   private Vector3 attackDirection;
   private Vector3 mousePos;
@@ -17,16 +19,23 @@ public class PlayerController : MonoBehaviour
   private float inputY;
 
   public float moveSpeed = 8f;
-  [SerializeField] bool seeRay;
-  [SerializeField] float attackLength = 2f;
+  public int attackDamage = 10;
+  //[SerializeField] float attackLength = 2f;
+
+  public int maxHealth = 100;
 
   [SerializeField] GameObject slimePrefab; //temp
 
-  public void Start()
+  public void Awake()
   {
     rigidPlayer = this.GetComponent<Rigidbody2D>();
     transformPlayer = this.GetComponent<Transform>();
-
+    healthManager = this.GetComponent<PlayerHealthManager>();
+  }
+  
+  public void Start()
+  {
+    healthManager.Health = maxHealth;
     stateMachine.ChangeState(new PlayerIdleState(this));
   }
 
@@ -44,28 +53,13 @@ public class PlayerController : MonoBehaviour
     //Update current state after input calculations
     stateMachine.SMUpdate();
 
-    //Raycast attack (legacy)
-    if (Input.GetMouseButtonDown(0))
+    //Attack legacy GARB refactor plzz
+    if (Input.GetKey(KeyCode.E))
     {
-      Debug.Log("Attacking");
-
-      RaycastHit2D hit = Physics2D.Raycast(
-        transformPlayer.position, attackDirection, attackLength, attackLayer
-      );
-
-      if (hit.collider != null)
-      {
-        Debug.Log("Hit: " + hit.collider.gameObject.name);
-        hit.collider.gameObject.GetComponent<SlimeEnemyController>().TakeDamage(10);
-      }
+      StartCoroutine(Attack());
     }
 
     //Moderation tools
-    if (seeRay)
-    {
-      Debug.DrawRay(transformPlayer.position, attackDirection * attackLength, Color.red);
-    }
-
     if (Input.GetKeyDown(KeyCode.Q))
     {
       Debug.Log("Make Slime");
@@ -73,8 +67,26 @@ public class PlayerController : MonoBehaviour
     }
   }
 
+  IEnumerator Attack() 
+  {
+    weaponTrigger.enabled = true;
+    yield return new WaitForSeconds(0.2f);
+    weaponTrigger.enabled = false;
+    yield return new WaitForSeconds(0.8f);
+  }
+
   public void FixedUpdate()
   {
     stateMachine.SMFixedUpdate();
+  }
+
+  //Needs a cooldown!! Coroutine it up boi
+  public void OnCollisionEnter2D(Collision2D entity)
+  {
+    if (entity.gameObject.tag == "Enemy")
+    {
+      healthManager.TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
+      Debug.Log("Player took damage. Current health: " + healthManager.Health);
+    }
   }
 }

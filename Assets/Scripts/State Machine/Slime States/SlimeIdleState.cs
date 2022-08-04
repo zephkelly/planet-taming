@@ -2,20 +2,18 @@ using UnityEngine;
 
 public class SlimeIdleState : IState
 {
-    private SlimeEnemyController controller;
+    private EnemyController controller;
 
     private float idleTime;
 
-    public SlimeIdleState(SlimeEnemyController c)
+    public SlimeIdleState(EnemyController c)
     {
       controller = c;
     }
 
     public void Entry()
     {
-      Debug.Log("Slime is entering idle");
       idleTime = Random.Range(2f, 4f);
-      Debug.Log(idleTime);
     }
 
     public void Update()
@@ -26,7 +24,6 @@ public class SlimeIdleState : IState
         return;
       }
       
-      Debug.Log("Slime idle timer = 0");
       controller.stateMachine.ChangeState(new SlimeMoveState(controller));
     }
 

@@ -21,7 +21,6 @@ public class GameplayManager : MonoBehaviour
 
     IEnumerator DeathWait(GameObject player)
     {
-      Destroy(player);
       yield return new WaitForSeconds(3f);
 
       playerCurrent = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity);
