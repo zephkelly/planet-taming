@@ -14,7 +14,7 @@ public class CameraFollow : MonoBehaviour
     target = GameObject.Find("Player").transform;
   }
 
-  public void Update()
+  public void LateUpdate()
   {
     if (target != null)
     {

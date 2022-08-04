@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class GameplayManager : MonoBehaviour
 {
-  public GameObject cameraMain;
-  public GameObject playerPrefab;
-  public Transform playerSpawnPoints;
+  [SerializeField] GameObject cameraMain;
+  [SerializeField] GameObject playerPrefab;
+  [SerializeField] Transform playerSpawnPoint;
   private GameObject playerCurrent;
 
   public void Start()
@@ -24,10 +24,10 @@ public class GameplayManager : MonoBehaviour
       Destroy(player);
       yield return new WaitForSeconds(3f);
 
-      playerCurrent = Instantiate(playerPrefab, playerSpawnPoints.position, Quaternion.identity);
+      playerCurrent = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity);
       cameraMain.GetComponent<CameraFollow>().ChangeFocus(playerCurrent.transform);
-    }
 
-    Debug.Log("Player respawned at: " + playerSpawnPoints.position);
+      Debug.Log("Player respawned at: " + playerSpawnPoint.position);
+    }
   }
 }

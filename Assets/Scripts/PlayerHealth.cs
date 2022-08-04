@@ -5,24 +5,25 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour
 {
   public GameplayManager gameplayManager;
-  public SpriteRenderer spriteRenderer;
+  [SerializeField] SpriteRenderer spriteRenderer;
 
-  public int maxHealth = 100;
-  public int currentHealth;
+  [SerializeField] int maxHealth = 100;
+  [SerializeField] int currentHealth;
 
   public void Start ()
   {
     gameplayManager = GameObject.FindGameObjectWithTag("PersistentManager").GetComponent<GameplayManager>();
+    spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 
     currentHealth = maxHealth;
   }
 
-  private void OnTriggerEnter2D(Collider2D entity)
+  private void OnTriggerEnter2D(Collider2D entity) //change this over to the enemy controller
   {
     if (entity.gameObject.tag == "Enemy")
     {
       Debug.Log("Player took damage. Current health: " + currentHealth);
-      TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
+      TakeDamage(entity.gameObject.GetComponent<SlimeEnemyController>().attackDamage);
     }
   }
 

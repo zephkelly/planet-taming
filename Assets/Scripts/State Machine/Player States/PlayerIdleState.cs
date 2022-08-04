@@ -7,8 +7,6 @@ public class PlayerIdleState : IState
   private float maxIdleTimer = 10f;
   private float currentIdleTimer;
 
-  bool activateIdleAnimation;
-
   public PlayerIdleState(PlayerController c)
   {
     controller = c;
@@ -29,8 +27,7 @@ public class PlayerIdleState : IState
 
     if (currentIdleTimer <= 0)
     {
-      activateIdleAnimation = true;
-      return; //Careful of this...
+      return; //Careful of this return
     }
 
     currentIdleTimer -= Time.deltaTime;

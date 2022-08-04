@@ -8,7 +8,7 @@ public interface IState
     void Exit();
 }
 
-public class PlayerStateManager
+public class StateManager
 {
   IState currentState;
 

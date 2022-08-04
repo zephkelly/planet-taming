@@ -4,24 +4,23 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-  public PlayerStateManager stateMachine = new PlayerStateManager();
+  public StateManager stateMachine = new StateManager();
 
   public Rigidbody2D rigidPlayer;
-  public Transform transformPlayer;
-  public LayerMask attackLayer;
-  public Vector3 attackDirection;
-  public Vector3 mousePos;
+  [SerializeField] LayerMask attackLayer;
+  private Transform transformPlayer;
+  private Vector3 attackDirection;
+  private Vector3 mousePos;
 
   public Vector2 inputs;
   private float inputX;
   private float inputY;
 
-  public bool seeRay;
-  public bool isAttacking;
   public float moveSpeed = 8f;
-  public float attackLength = 2f;
+  [SerializeField] bool seeRay;
+  [SerializeField] float attackLength = 2f;
 
-  public GameObject slimePrefab; //temp
+  [SerializeField] GameObject slimePrefab; //temp
 
   public void Start()
   {
@@ -49,7 +48,6 @@ public class PlayerController : MonoBehaviour
     if (Input.GetMouseButtonDown(0))
     {
       Debug.Log("Attacking");
-      isAttacking = true;
 
       RaycastHit2D hit = Physics2D.Raycast(
         transformPlayer.position, attackDirection, attackLength, attackLayer
@@ -58,12 +56,8 @@ public class PlayerController : MonoBehaviour
       if (hit.collider != null)
       {
         Debug.Log("Hit: " + hit.collider.gameObject.name);
-        hit.collider.gameObject.GetComponent<EnemyController>().TakeDamage(10);
+        hit.collider.gameObject.GetComponent<SlimeEnemyController>().TakeDamage(10);
       }
-    }
-    else
-    {
-      isAttacking = false;
     }
 
     //Moderation tools

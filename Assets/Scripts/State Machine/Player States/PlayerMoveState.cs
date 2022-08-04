@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerMoveState : IState
 {
-  public PlayerController controller;
+  private PlayerController controller;
 
   public PlayerMoveState(PlayerController c)
   {
