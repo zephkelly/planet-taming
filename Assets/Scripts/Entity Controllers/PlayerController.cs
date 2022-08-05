@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
 
   public Rigidbody2D rigidPlayer;
   private Animator animatorPlayer;
+  private SpriteRenderer spriteRendererPlayer;
   private Transform transformPlayer;
   private Vector3 attackDirection;
   private Vector3 mousePos;
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
 
   public void Awake()
   {
+    spriteRendererPlayer = this.GetComponent<SpriteRenderer>();
     healthManager = this.GetComponent<PlayerHealthManager>();
     transformPlayer = this.GetComponent<Transform>();
     rigidPlayer = this.GetComponent<Rigidbody2D>();
@@ -47,6 +49,8 @@ public class PlayerController : MonoBehaviour
   {
     UpdateInputs();
     stateMachine.SMUpdate();
+
+    spriteRendererPlayer.sortingOrder = (int) transformPlayer.position.y;
 
     if (attackWaitTimer > 0 || damageWaitTimer > 0) 
     {

@@ -19,7 +19,7 @@ public class SlimeRunState : IState
     public void Entry()
     {
       timeTillJump = 0f;
-      runTime = Random.Range(10f, 18f);
+      runTime = Random.Range(15f, 18f);
 
       runDirection = (controller.transform.position - attackingEntity.position).normalized;
     }

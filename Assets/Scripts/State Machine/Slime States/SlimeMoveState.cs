@@ -20,11 +20,13 @@ public class SlimeMoveState : IState
   {
     moveDirX = Random.Range(-1f, 1f);
     moveDirY = Random.Range(-1f, 1f);
-    moveImpluseStrength = Random.Range(8f, 12f);
+    moveImpluseStrength = Random.Range(14f, 16f);
 
     moveDirection = new Vector3(moveDirX, moveDirY, 0f);
 
-    controller.enemyRigidbody.AddForce(moveDirection * moveImpluseStrength);
+    controller.enemyRigidbody.AddForce(moveDirection * moveImpluseStrength, ForceMode2D.Impulse);
+
+    Debug.Log("Slime is moving");
   }
 
   public void Update()

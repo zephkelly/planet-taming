@@ -8,6 +8,7 @@ public class EnemyController : MonoBehaviour
   public EnemyHealthManager healthManager;
 
   public Rigidbody2D enemyRigidbody;
+  private SpriteRenderer enemySpriteRenderer;
 
   //make an audio manager??
   private AudioSource enemyAudio;
@@ -25,6 +26,7 @@ public class EnemyController : MonoBehaviour
   {
     enemyRigidbody = gameObject.GetComponent<Rigidbody2D>();
     healthManager = gameObject.GetComponent<EnemyHealthManager>();
+    enemySpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     enemyAudio = gameObject.GetComponent<AudioSource>();
   }
 
@@ -37,6 +39,8 @@ public class EnemyController : MonoBehaviour
   public void Update ()
   {
     stateMachine.SMUpdate();
+
+    enemySpriteRenderer.sortingOrder = (int) this.transform.position.y;
 
     if (damageWaitTimer > 0) 
     {
