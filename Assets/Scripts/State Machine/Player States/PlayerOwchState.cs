@@ -1,21 +1,26 @@
 using UnityEngine;
 
-public class PlayerMoveState : IState
+public class PlayerOwchState : IState
 {
   private PlayerController controller;
 
-  public PlayerMoveState(PlayerController c)
+  private float cooldownTimer = 0.3f;
+
+  public PlayerOwchState(PlayerController c)
   {
     controller = c;
   }
 
   public void Entry()
   {
+    cooldownTimer = 0.3f;
   }
 
   public void Update()
   {
-    if (controller.inputs == Vector2.zero)
+    cooldownTimer -= Time.deltaTime;
+
+    if (cooldownTimer <= 0)
     {
       controller.stateMachine.ChangeState(new PlayerIdleState(controller));
     }
@@ -23,7 +28,6 @@ public class PlayerMoveState : IState
 
   public void FixedUpdate()
   {
-    controller.rigidPlayer.AddForce(controller.inputs.normalized * controller.moveSpeed, ForceMode2D.Impulse);
   }
 
   public void Exit()

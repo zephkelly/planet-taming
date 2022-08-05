@@ -20,7 +20,7 @@ public class SlimeMoveState : IState
   {
     moveDirX = Random.Range(-1f, 1f);
     moveDirY = Random.Range(-1f, 1f);
-    moveImpluseStrength = Random.Range(2000f, 4000f);
+    moveImpluseStrength = Random.Range(8f, 12f);
 
     moveDirection = new Vector3(moveDirX, moveDirY, 0f);
 

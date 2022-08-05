@@ -19,7 +19,9 @@ public class PlayerController : MonoBehaviour
   private float inputX;
   private float inputY;
 
+  public bool isAttacking;
   public float moveSpeed = 8f;
+  public float knockbackForce = 10f;
   public int maxHealth = 100;
   public int attackDamage = 10;
   private float attackWaitTimer = 0f;
@@ -52,15 +54,27 @@ public class PlayerController : MonoBehaviour
       damageWaitTimer -= Time.deltaTime;
     }
 
-    if (Input.GetMouseButtonDown(0) && attackWaitTimer <= 0)
+    while (Input.GetMouseButtonDown(0))
     {
-      Debug.Log("Attacking...");
+      if (attackWaitTimer > 0) return;
+
+      isAttacking = true;
       attackWaitTimer = 0.5f;
       StartCoroutine(Attack());
+
+      IEnumerator Attack() 
+      {
+        weaponTrigger.enabled = true;
+
+        yield return new WaitForSeconds(0.3f);
+
+        weaponTrigger.enabled = false;
+        isAttacking = false;
+      }
     }
 
     //Moderation tools
-    if (Input.GetKeyDown(KeyCode.Q))
+    if (Input.GetKeyDown(KeyCode.Q)) //Make slime
     {
       Debug.Log("Make Slime");
       Instantiate(slimePrefab, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
@@ -94,21 +108,17 @@ public class PlayerController : MonoBehaviour
     }
   }
 
-  IEnumerator Attack() 
-  {
-    weaponTrigger.enabled = true;
-    yield return new WaitForSeconds(0.3f);
-    weaponTrigger.enabled = false;
-  }
-
-
-  //Needs a cooldown!! Coroutine it up boi
   public void OnCollisionEnter2D(Collision2D entity)
   {
-    if (entity.gameObject.tag == "Enemy" && damageWaitTimer <= 0)
+    if (entity.gameObject.tag == "Enemy")
     {
+      if (damageWaitTimer > 0) return;
+
       damageWaitTimer = 0.5f;
+
       healthManager.TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
+      
+      rigidPlayer.AddForce((this.transform.position - entity.transform.position) * knockbackForce, ForceMode2D.Impulse);
     }
   }
 }
