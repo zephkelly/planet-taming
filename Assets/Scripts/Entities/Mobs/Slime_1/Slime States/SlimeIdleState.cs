@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class SlimeIdleState : IState
 {
-    private EnemyController controller;
+    private SlimeController controller;
 
     private float idleTime;
 
-    public SlimeIdleState(EnemyController c)
+    public SlimeIdleState(SlimeController c)
     {
       controller = c;
     }
@@ -24,7 +24,7 @@ public class SlimeIdleState : IState
         return;
       }
       
-      controller.stateMachine.ChangeState(new SlimeMoveState(controller));
+      controller.stateManager.ChangeState(new SlimeMoveState(controller));
     }
 
     public void FixedUpdate()

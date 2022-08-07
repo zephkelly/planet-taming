@@ -2,17 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+[RequireComponent(typeof(PlayerStats))]
+public class PlayerController2 : MonoBehaviour
 {
+  /*
+  public GameplayManager gameplayManager;
   public StateManager stateMachine = new StateManager();
-  public PlayerHealthManager healthManager;
+  public HealthManager healthManager;
+  public PlayerStats playerStats;
 
   [SerializeField] private Collider2D weaponTrigger;
 
-  public Rigidbody2D rigidPlayer;
-  private Animator animatorPlayer;
-  private SpriteRenderer spriteRendererPlayer;
-  private Transform transformPlayer;
+  public Rigidbody2D playerRigidbody;
+  private Animator playerAnimator;
+  private SpriteRenderer playerSpriteRenderer;
+  private Transform playerTransform;
   private Vector3 attackDirection;
   private Vector3 mousePos;
 
@@ -24,7 +28,7 @@ public class PlayerController : MonoBehaviour
   public float moveSpeed = 8f;
   public float knockbackForce = 10f;
   public int maxHealth = 100;
-  public int attackDamage = 10;
+  public int attackDamage;
   private float attackWaitTimer = 0f;
   private float damageWaitTimer = 0f;
 
@@ -32,25 +36,27 @@ public class PlayerController : MonoBehaviour
 
   public void Awake()
   {
-    spriteRendererPlayer = this.GetComponent<SpriteRenderer>();
-    healthManager = this.GetComponent<PlayerHealthManager>();
-    transformPlayer = this.GetComponent<Transform>();
-    rigidPlayer = this.GetComponent<Rigidbody2D>();
-    animatorPlayer = this.GetComponent<Animator>();
+    gameplayManager = GameObject.FindGameObjectWithTag("PersistentManager").GetComponent<GameplayManager>();
+    playerSpriteRenderer = this.GetComponent<SpriteRenderer>();
+    playerTransform = this.GetComponent<Transform>();
+    playerRigidbody = this.GetComponent<Rigidbody2D>();
+    playerAnimator = this.GetComponent<Animator>();
+
+    healthManager = new HealthManager();
+    playerStats = this.GetComponent<PlayerStats>();
   }
   
   public void Start()
   {
-    healthManager.Health = maxHealth;
+    healthManager.Init(this, healthManager, playerSpriteRenderer);
+
     stateMachine.ChangeState(new PlayerIdleState(this));
   }
 
   public void Update()
   {
     UpdateInputs();
-    stateMachine.SMUpdate();
-
-    spriteRendererPlayer.sortingOrder = (int) transformPlayer.position.y;
+    stateMachine.Update();
 
     if (attackWaitTimer > 0 || damageWaitTimer > 0) 
     {
@@ -83,6 +89,12 @@ public class PlayerController : MonoBehaviour
       Debug.Log("Make Slime");
       Instantiate(slimePrefab, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
     }
+
+    if (Input.GetKeyDown(KeyCode.H)) //Damage player
+    {
+      Debug.Log("Damage player");
+      healthManager.TakeDamage(10);
+    }
   }
 
   public void FixedUpdate()
@@ -97,21 +109,21 @@ public class PlayerController : MonoBehaviour
     inputs = new Vector2(inputX, inputY);
 
     mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    attackDirection = mousePos - transformPlayer.position;
+    attackDirection = mousePos - playerTransform.position;
     attackDirection.z = 0f;
     attackDirection.Normalize();
 
     //Update animator
-    animatorPlayer.SetFloat("inputX", inputX);
-    animatorPlayer.SetFloat("inputY", inputY);
+    playerAnimator.SetFloat("inputX", inputX);
+    playerAnimator.SetFloat("inputY", inputY);
 
     if (inputs != Vector2.zero)
     {
-      animatorPlayer.SetFloat("lastX", inputX);
-      animatorPlayer.SetFloat("lastY", inputY);
+      playerAnimator.SetFloat("lastX", inputX);
+      playerAnimator.SetFloat("lastY", inputY);
     }
   }
-
+/*
   public void OnCollisionEnter2D(Collision2D entity)
   {
     if (entity.gameObject.tag == "Enemy")
@@ -120,9 +132,10 @@ public class PlayerController : MonoBehaviour
 
       damageWaitTimer = 0.5f;
 
-      healthManager.TakeDamage(entity.gameObject.GetComponent<EnemyController>().attackDamage);
+      healthManager.TakeDamage(entity.gameObject.GetComponent<Controller>().attackDamage);
       
-      rigidPlayer.AddForce((this.transform.position - entity.transform.position) * knockbackForce, ForceMode2D.Impulse);
+      playerRigidbody.AddForce((this.transform.position - entity.transform.position) * knockbackForce, ForceMode2D.Impulse);
     }
   }
+*/
 }

@@ -23,7 +23,7 @@ public class StateManager
     currentState.Entry();
   }
 
-  public void SMUpdate()
+  public void Update()
   {
     if (currentState == null)
     {
@@ -33,7 +33,7 @@ public class StateManager
     currentState.Update();
   }
 
-  public void SMFixedUpdate()
+  public void FixedUpdate()
   {
     if (currentState == null)
     {

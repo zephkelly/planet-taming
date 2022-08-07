@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class PlayerOwchState : IState
 {
-  private PlayerController controller;
+  private PlayerController playerController;
 
   private float cooldownTimer = 0.3f;
 
   public PlayerOwchState(PlayerController c)
   {
-    controller = c;
+    playerController = c;
   }
 
   public void Entry()
@@ -22,7 +22,7 @@ public class PlayerOwchState : IState
 
     if (cooldownTimer <= 0)
     {
-      controller.stateMachine.ChangeState(new PlayerIdleState(controller));
+      playerController.stateManager.ChangeState(new PlayerIdleState(playerController));
     }
   }
 

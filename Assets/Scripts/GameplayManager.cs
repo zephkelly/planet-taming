@@ -15,11 +15,11 @@ public class GameplayManager : MonoBehaviour
     cameraMain = GameObject.FindGameObjectWithTag("MainCamera");
   }
 
-  public void RespawnPlayer(GameObject player)
+  public void RespawnPlayer()
   {
-    StartCoroutine(DeathWait(player));
+    StartCoroutine(DeathWait());
 
-    IEnumerator DeathWait(GameObject player)
+    IEnumerator DeathWait()
     {
       yield return new WaitForSeconds(3f);
 

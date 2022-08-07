@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerStats))]
 public class EnemyController : MonoBehaviour
 {
+  /*
   public StateManager stateMachine = new StateManager();
-  public EnemyHealthManager healthManager;
+  public HealthManager healthManager;
+  public SlimeStats slimeStats;
 
   public Rigidbody2D enemyRigidbody;
   private SpriteRenderer enemySpriteRenderer;
@@ -16,31 +19,34 @@ public class EnemyController : MonoBehaviour
     [SerializeField] AudioClip enemyAttackSound2;
     [SerializeField] AudioClip enemyAttackSound3;
 
-  public int attackDamage = 10; //change 
-  public int maxHealth = 50;
+  public int attackDamage;
   public float knockbackForce = 5f; //Knockback needs to come from other entities not here, same with player
+  public int maxHealth;
+  public int currentHealth;
 
   private float damageWaitTimer = 0f;
 
   public void Awake ()
   {
     enemyRigidbody = gameObject.GetComponent<Rigidbody2D>();
-    healthManager = gameObject.GetComponent<EnemyHealthManager>();
     enemySpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     enemyAudio = gameObject.GetComponent<AudioSource>();
+
+    healthManager = new HealthManager();
+    slimeStats = gameObject.GetComponent<SlimeStats>();
   }
 
   public void Start ()
   {
-    healthManager.Health = maxHealth;
+    healthManager.Init(this, healthManager, enemySpriteRenderer);
+    healthManager.MaxHealth = maxHealth;
+
     stateMachine.ChangeState(new SlimeIdleState(this));
   }
 
   public void Update ()
   {
     stateMachine.SMUpdate();
-
-    enemySpriteRenderer.sortingOrder = (int) this.transform.position.y;
 
     if (damageWaitTimer > 0) 
     {
@@ -72,13 +78,14 @@ public class EnemyController : MonoBehaviour
         enemyAudio.PlayOneShot(enemyAttackSound3);
       }
 
-      healthManager.TakeDamage(collider.GetComponent<PlayerController>().attackDamage);
-
       enemyRigidbody.AddForce((this.transform.position - collider.transform.position) * knockbackForce, ForceMode2D.Impulse);
 
       stateMachine.ChangeState(new SlimeRunState(this, collider.transform));
+      
+      healthManager.TakeDamage(collider.GetComponent<PlayerController>().attackDamage);
+
     }
   }
 
-  public void FixedUpdate() { stateMachine.SMFixedUpdate(); }
+  public void FixedUpdate() { stateMachine.SMFixedUpdate(); } */
 }

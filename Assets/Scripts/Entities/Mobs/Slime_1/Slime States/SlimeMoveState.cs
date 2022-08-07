@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class SlimeMoveState : IState
 {
-  public EnemyController controller;
+  public SlimeController slimeController;
 
   private Vector3 moveDirection;
     private float moveDirX;
     private float moveDirY;
   private float moveImpluseStrength;
 
-  public SlimeMoveState(EnemyController c)
+  public SlimeMoveState(SlimeController c)
   {
-    controller = c;
+    slimeController = c;
   }
 
   public void Entry()
@@ -24,16 +24,14 @@ public class SlimeMoveState : IState
 
     moveDirection = new Vector3(moveDirX, moveDirY, 0f);
 
-    controller.enemyRigidbody.AddForce(moveDirection * moveImpluseStrength, ForceMode2D.Impulse);
-
-    Debug.Log("Slime is moving");
+    slimeController.controller.rigid2D.AddForce(moveDirection * moveImpluseStrength, ForceMode2D.Impulse);
   }
 
   public void Update()
   {
-    if (controller.enemyRigidbody.velocity.magnitude < 0.1f)
+    if (slimeController.controller.rigid2D.velocity.magnitude < 0.1f)
     {
-      controller.stateMachine.ChangeState(new SlimeIdleState(controller));
+      slimeController.stateManager.ChangeState(new SlimeIdleState(slimeController));
     }
   }
 
@@ -44,6 +42,5 @@ public class SlimeMoveState : IState
 
   public void Exit()
   {
-
   }
 }

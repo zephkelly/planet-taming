@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class PlayerIdleState : IState
 {
-  private PlayerController controller;
+  private PlayerController playerController;
 
   private float maxIdleTimer = 10f;
   private float currentIdleTimer;
 
   public PlayerIdleState(PlayerController c)
   {
-    controller = c;
+    playerController = c;
   }
 
   public void Entry()
@@ -19,9 +19,9 @@ public class PlayerIdleState : IState
 
   public void Update()
   {
-    if (controller.inputs != Vector2.zero)
+    if (playerController.inputs != Vector3.zero)
     {
-      controller.stateMachine.ChangeState(new PlayerMoveState(controller));
+      playerController.stateManager.ChangeState(new PlayerMoveState(playerController));
     }
 
     if (currentIdleTimer <= 0)
