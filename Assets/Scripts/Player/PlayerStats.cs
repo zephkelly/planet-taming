@@ -15,7 +15,7 @@ public class PlayerStats : MonoBehaviour, IHealth
     spriteRenderer = sr;
   }
 
-  public void TakeDamage(int damage)
+  public void TakeDamage(int damage, Transform attacker)
   {
     healthManager.Health -= damage;
 

@@ -15,7 +15,7 @@ public class SlimeStats : MonoBehaviour, IHealth
     spriteRenderer = s;
   }
 
-  public void TakeDamage(int damage)
+  public void TakeDamage(int damage, Transform attacker)
   {
     healthManager.Health -= damage;
 
@@ -25,6 +25,8 @@ public class SlimeStats : MonoBehaviour, IHealth
       Die(gameObject);
       return;
     }
+
+    controller.stateManager.ChangeState(new SlimeRunState(controller, attacker));
 
     StartCoroutine(FlashRed());
 

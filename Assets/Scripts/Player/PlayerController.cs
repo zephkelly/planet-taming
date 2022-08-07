@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour, IController
     if (Input.GetKeyDown(KeyCode.H)) //Damage player
     {
       Debug.Log("Damage player");
-      healthManager.TakeDamage(10);
+      healthManager.TakeDamage(10, this.transform);
     }
   }
 
@@ -103,4 +103,6 @@ public class PlayerController : MonoBehaviour, IController
     animator.SetFloat("lastX", inputs.x);
     animator.SetFloat("lastY", inputs.y);
   }
+
+  public void ResetIdle() => stateManager.ChangeState(new PlayerIdleState(this));
 }

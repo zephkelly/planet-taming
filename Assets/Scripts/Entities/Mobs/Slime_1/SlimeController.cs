@@ -32,16 +32,17 @@ public class SlimeController : MonoBehaviour, IController
 
   public void OnTriggerEnter2D(Collider2D collider)
   {
+    if (healthManager.Health <= 0) return;
     if (invulnerabilityTimer > 0) return;
-    
+
     if (collider.tag == "Player" && collider.GetComponent<Controller>().IsAttacking)
     {
-      healthManager.TakeDamage(collider.GetComponent<Controller>().AttackDamage);
+      healthManager.TakeDamage(collider.GetComponent<Controller>().AttackDamage, collider.transform);
       invulnerabilityTimer = 0.5f;
-
-      stateManager.ChangeState(new SlimeRunState(this, collider.transform));
 
       controller.rigid2D.AddForce((this.transform.position - collider.transform.position).normalized * 5f, ForceMode2D.Impulse);
     }
   }
+
+  public void ResetIdle() => stateManager.ChangeState(new SlimeIdleState(this));
 }

@@ -14,6 +14,7 @@ public class SlimeDeathState : IState
     public void Entry()
     {
       Debug.Log(controller.gameObject.tag + " is dead");
+      controller.GetComponent<Collider2D>().enabled = false;
       spriteRenderer.color = Color.red;
     }
 

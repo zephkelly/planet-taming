@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IHealth
 {
   void Init(Controller c, HealthManager hm, SpriteRenderer sr);
-  void TakeDamage(int damage);
+  void TakeDamage(int damage, Transform attacker);
   void Heal(int healing);
   void Die(GameObject g);
   
@@ -50,9 +50,9 @@ public class HealthManager
     this.health = health;
   }
 
-  public void TakeDamage(int damage)
+  public void TakeDamage(int damage,Transform attacker)
   {
-    stats.TakeDamage(damage);
+    stats.TakeDamage(damage, attacker);
   }
 
   public void Heal(int healing)

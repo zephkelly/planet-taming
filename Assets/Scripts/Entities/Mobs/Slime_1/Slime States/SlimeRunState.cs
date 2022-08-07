@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SlimeRunState : IState
 {
-    private SlimeController slimeController;
+    private Controller controller;
     private Transform attackingEntity;
     private Vector3 runDirection;
 
@@ -10,9 +10,9 @@ public class SlimeRunState : IState
     private float timeTillJump;
     private float moveImpluseStrength;
 
-    public SlimeRunState(SlimeController c, Transform t)
+    public SlimeRunState(Controller c, Transform t)
     {
-      slimeController = c;
+      controller = c;
       attackingEntity = t;
     }
 
@@ -21,7 +21,7 @@ public class SlimeRunState : IState
       timeTillJump = 0f;
       runTime = Random.Range(10f, 14f);
 
-      runDirection = (slimeController.transform.position - attackingEntity.position).normalized;
+      runDirection = (controller.transform.position - attackingEntity.position).normalized;
     }
 
     public void Update()
@@ -36,7 +36,7 @@ public class SlimeRunState : IState
       return;
       }
 
-      slimeController.stateManager.ChangeState(new SlimeIdleState(slimeController));
+      controller.ResetIdle();
     }
 
     public void FixedUpdate()
@@ -54,8 +54,8 @@ public class SlimeRunState : IState
       timeTillJump = Random.Range(0.5f, 1.2f);
       moveImpluseStrength = Random.Range(12f, 14f);
 
-      slimeController.controller.rigid2D.AddForce(runDirection * moveImpluseStrength, ForceMode2D.Impulse);
+      controller.rigid2D.AddForce(runDirection * moveImpluseStrength, ForceMode2D.Impulse);
 
-      runDirection = (slimeController.transform.position - attackingEntity.position).normalized;
+      runDirection = (controller.transform.position - attackingEntity.position).normalized;
     }
 }

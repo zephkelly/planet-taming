@@ -5,6 +5,7 @@ using UnityEngine;
 public interface IController
 {
   void Init(Controller c, StateManager sm, HealthManager hm);
+  void ResetIdle();
 }
 
 [RequireComponent(typeof(IController))]
@@ -81,9 +82,14 @@ public class Controller : MonoBehaviour
     stateManager.FixedUpdate();
   }
 
-  public void TakeDamage(int damage)
+  public void TakeDamage(int damage, Transform attacker)
   {
-    healthManager.TakeDamage(damage);
+    healthManager.TakeDamage(damage, attacker);
+  }
+
+  public void ResetIdle()
+  {
+    controller.ResetIdle();
   }
 }
 
