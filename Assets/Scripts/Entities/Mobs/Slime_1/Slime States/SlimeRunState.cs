@@ -36,7 +36,7 @@ public class SlimeRunState : IState
       return;
       }
 
-      controller.ResetIdle();
+      controller.stateManager.ChangeState(new SlimeIdleState(controller));
     }
 
     public void FixedUpdate()

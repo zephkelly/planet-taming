@@ -2,24 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour, IHealth
+public class PlayerStats : MonoBehaviour, IStats
 {
   private Controller playerController;
-  private HealthManager healthManager;
+  private StatsManager statsManager;
   private SpriteRenderer spriteRenderer;
 
-  public void Init(Controller c, HealthManager hm, SpriteRenderer sr)
+  public void Init(Controller c, StatsManager statsm, SpriteRenderer sr)
   {
     playerController = c;
-    healthManager = hm;
+    statsManager = statsm;
     spriteRenderer = sr;
   }
 
   public void TakeDamage(int damage, Transform attacker)
   {
-    healthManager.Health -= damage;
+    statsManager.Health -= damage;
 
-    if (healthManager.Health <= 0)
+    if (statsManager.Health <= 0)
     {
       Die(gameObject);
       return;

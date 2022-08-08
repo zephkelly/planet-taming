@@ -2,18 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlimeMoveState : IState
+public class SlimeJumpState : IState
 {
-  public SlimeController slimeController;
+  public Controller controller;
 
   private Vector3 moveDirection;
     private float moveDirX;
     private float moveDirY;
   private float moveImpluseStrength;
 
-  public SlimeMoveState(SlimeController c)
+  public SlimeJumpState(Controller c)
   {
-    slimeController = c;
+    controller = c;
   }
 
   public void Entry()
@@ -24,14 +24,14 @@ public class SlimeMoveState : IState
 
     moveDirection = new Vector3(moveDirX, moveDirY, 0f);
 
-    slimeController.controller.rigid2D.AddForce(moveDirection * moveImpluseStrength, ForceMode2D.Impulse);
+    controller.rigid2D.AddForce(moveDirection * moveImpluseStrength, ForceMode2D.Impulse);
   }
 
   public void Update()
   {
-    if (slimeController.controller.rigid2D.velocity.magnitude < 0.1f)
+    if (controller.rigid2D.velocity.magnitude < 0.1f)
     {
-      slimeController.stateManager.ChangeState(new SlimeIdleState(slimeController));
+      controller.stateManager.ChangeState(new SlimeIdleState(controller));
     }
   }
 

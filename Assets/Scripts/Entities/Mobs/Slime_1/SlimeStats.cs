@@ -2,25 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlimeStats : MonoBehaviour, IHealth
+public class SlimeStats : MonoBehaviour, IStats
 {
   private Controller controller;
-  private HealthManager healthManager;
+  private StatsManager statsManager;
   private SpriteRenderer spriteRenderer;
 
-
-  public void Init (Controller c, HealthManager h, SpriteRenderer s)
+  public void Init (Controller c, StatsManager sm, SpriteRenderer s)
   {
     controller = c;
-    healthManager = h;
+    statsManager = sm;
     spriteRenderer = s;
   }
 
   public void TakeDamage(int damage, Transform attacker)
   {
-    healthManager.Health -= damage;
-
-    if (healthManager.Health <= 0)
+    if (statsManager.Health <= 0)
     {
       controller.stateManager.ChangeState(new SlimeDeathState(controller, spriteRenderer));
       Die(gameObject);

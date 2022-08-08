@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IHealth
+public interface IStats
 {
-  void Init(Controller c, HealthManager hm, SpriteRenderer sr);
+  void Init(Controller c, StatsManager statsm, SpriteRenderer sr);
   void TakeDamage(int damage, Transform attacker);
   void Heal(int healing);
   void Die(GameObject g);
@@ -12,13 +12,14 @@ public interface IHealth
   //void ApplyDebuff(Debuff debuff);
 }
 
-public class HealthManager
+public class StatsManager
 {
   public Controller hostController;
-  public IHealth stats;
+  public IStats entityStats;
 
   public int maxHealth;
   public int health;
+  public int knockback;
 
   public int MaxHealth
   {
@@ -32,13 +33,14 @@ public class HealthManager
     set { health = value; }
   }
 
-  public void Init(Controller c, HealthManager hm, IHealth stats, SpriteRenderer sr)
+  public void Init(Controller c, StatsManager statsm, IStats entityStats, SpriteRenderer sr)
   {
     hostController = c;
 
-    this.stats = stats;
-    stats.Init(c, hm, sr);
-    
+    this.entityStats = entityStats;
+    entityStats.Init(c, statsm, sr);
+
+    knockback = c.knockback;
     maxHealth = c.health;
     health = maxHealth;
   }
@@ -55,18 +57,19 @@ public class HealthManager
 
   public void TakeDamage(int damage,Transform attacker)
   {
-    stats.TakeDamage(damage, attacker);
-    UpdateHealthBar(MaxHealth, Health);
+    health -= damage;
+    entityStats.TakeDamage(damage, attacker);
+    UpdateHealthBar(maxHealth, health);
   }
 
   public void Heal(int healing)
   {
-    stats.Heal(healing);
+    entityStats.Heal(healing);
   }
 
   public void Die(GameObject g)
   {
-    stats.Die(g);
+    entityStats.Die(g);
   }
 
   public void UpdateHealthBar(float maxHealth, float currentHealth)

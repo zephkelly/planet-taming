@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour, IController
 {
   public Controller controller;
   public StateManager stateManager;
-  public HealthManager healthManager;
+  public StatsManager statsManager;
 
   public Rigidbody2D rigid2D;
   public SpriteRenderer spriteRenderer;
@@ -25,11 +25,11 @@ public class PlayerController : MonoBehaviour, IController
   public bool isSprinting;
   public float sprintSpeed;
 
-  public void Init(Controller c, StateManager sm, HealthManager hm)
+  public void Init(Controller c, StateManager sm, StatsManager hm)
   {
     controller = c;
     stateManager = sm;
-    healthManager = hm;
+    statsManager = hm;
   }
 
   public void Awake()
@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour, IController
     animator = GetComponent<Animator>();
   }
 
-  public void Start() => stateManager.ChangeState(new PlayerIdleState(this));
+  public void Start() => stateManager.ChangeState(new PlayerIdleState(controller));
 
   public void Update()
   {
@@ -80,16 +80,16 @@ public class PlayerController : MonoBehaviour, IController
 
   public void ModerationTools()
   {
-    if (Input.GetKeyDown(KeyCode.Q)) //Make slime
+    if (Input.GetKeyDown(KeyCode.Q))
     {
-      Debug.Log("Make Slime");
+      //Debug.Log("Make Slime");
       Instantiate(slimePrefab, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
     }
 
-    if (Input.GetKeyDown(KeyCode.H)) //Damage player
+    if (Input.GetKeyDown(KeyCode.H))
     {
-      Debug.Log("Damage player");
-      healthManager.TakeDamage(10, this.transform);
+      //Debug.Log("Damage player");
+      statsManager.TakeDamage(10, this.transform);
     }
   }
 
@@ -109,5 +109,5 @@ public class PlayerController : MonoBehaviour, IController
     animator.SetFloat("lastY", inputs.y);
   }
 
-  public void ResetIdle() => stateManager.ChangeState(new PlayerIdleState(this));
+  public void ResetIdle() => stateManager.ChangeState(new PlayerIdleState(controller));
 }

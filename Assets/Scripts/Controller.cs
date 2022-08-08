@@ -5,27 +5,27 @@ using UnityEngine.UI;
 
 public interface IController
 {
-  void Init(Controller c, StateManager sm, HealthManager hm);
-  void ResetIdle();
+  void Init(Controller c, StateManager sm, StatsManager statsm);
 }
 
 [RequireComponent(typeof(IController))]
-[RequireComponent(typeof(IHealth))]
+[RequireComponent(typeof(IStats))]
 public class Controller : MonoBehaviour
 {
   public StateManager stateManager = new StateManager();
-  public HealthManager healthManager = new HealthManager();
-  public IController controller;
-  private IHealth stats;
+  public StatsManager statsManager = new StatsManager();
+  public IController controllerBlueprint;
+  public IStats entityStats;
 
   public Rigidbody2D rigid2D;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
-  public Canvas healthBarCanvas;
+  public Canvas healthBarCanvas; //need to set this manually
   public Image healthBarSlider;
 
   public int health;
-  public float moveSpeed;
+  public float walkSpeed;
+  public int knockback;
   public int attackDamage;
   public bool isAttacking;
 
@@ -35,9 +35,9 @@ public class Controller : MonoBehaviour
     set { }
   }
 
-  public float MoveSpeed
+  public float WalkSpeed
   {
-    get { return moveSpeed; }
+    get { return walkSpeed; }
     set { }
   }
 
@@ -55,8 +55,8 @@ public class Controller : MonoBehaviour
 
   public void Init()
   {
-    healthManager.Init(this, healthManager, stats, spriteRenderer);
-    controller.Init(this, stateManager, healthManager);
+    statsManager.Init(this, statsManager, entityStats, spriteRenderer);
+    controllerBlueprint.Init(this, stateManager, statsManager);
   }
 
   public void Awake()
@@ -64,10 +64,9 @@ public class Controller : MonoBehaviour
     rigid2D = GetComponent<Rigidbody2D>();
     spriteRenderer = GetComponent<SpriteRenderer>();
     audioSource = GetComponent<AudioSource>();
-    healthBarCanvas = GetComponentInChildren<Canvas>();
 
-    controller = GetComponent<IController>();
-    stats = GetComponent<IHealth>();
+    controllerBlueprint = GetComponent<IController>();
+    entityStats = GetComponent<IStats>();
 
     Init();
   }
@@ -88,12 +87,7 @@ public class Controller : MonoBehaviour
 
   public void TakeDamage(int damage, Transform attacker)
   {
-    healthManager.TakeDamage(damage, attacker);
-  }
-
-  public void ResetIdle()
-  {
-    controller.ResetIdle();
+    statsManager.TakeDamage(damage, attacker);
   }
 }
 

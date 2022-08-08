@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-  private Vector3 targetVector;
-
+  public Camera mainCamera;
   public Transform target;
+  private Vector3 targetVector;
   private Vector3 mousePosition;
 
   [SerializeField] float mouseInterpolateDistance = 2f;
 
   public float cameraPanSpeed = 0.125f;
+
+  public void Awake()
+  {
+    mainCamera = Camera.main;
+  }
 
   public void Start()
   {
@@ -20,7 +25,7 @@ public class CameraFollow : MonoBehaviour
 
   private void Update()
   {
-    mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
     mousePosition = mousePosition - target.position;
     mousePosition.Normalize();
     mousePosition.y = mousePosition.y * 1.8f; //beacuse the camera is wider than it is tall
