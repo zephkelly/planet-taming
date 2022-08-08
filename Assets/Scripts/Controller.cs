@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public interface IController
 {
@@ -20,6 +21,8 @@ public class Controller : MonoBehaviour
   public Rigidbody2D rigid2D;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
+  public Canvas healthBarCanvas;
+  public Image healthBarSlider;
 
   public int health;
   public float moveSpeed;
@@ -61,6 +64,7 @@ public class Controller : MonoBehaviour
     rigid2D = GetComponent<Rigidbody2D>();
     spriteRenderer = GetComponent<SpriteRenderer>();
     audioSource = GetComponent<AudioSource>();
+    healthBarCanvas = GetComponentInChildren<Canvas>();
 
     controller = GetComponent<IController>();
     stats = GetComponent<IHealth>();

@@ -8,6 +8,7 @@ public class SlimeStats : MonoBehaviour, IHealth
   private HealthManager healthManager;
   private SpriteRenderer spriteRenderer;
 
+
   public void Init (Controller c, HealthManager h, SpriteRenderer s)
   {
     controller = c;

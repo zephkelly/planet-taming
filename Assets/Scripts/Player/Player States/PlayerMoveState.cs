@@ -15,6 +15,11 @@ public class PlayerMoveState : IState
 
   public void Update()
   {
+    if (playerController.isSprinting)
+    {
+      playerController.stateManager.ChangeState(new PlayerSprintState(playerController));
+    }
+
     if (playerController.inputs == Vector3.zero)
     {
       playerController.stateManager.ChangeState(new PlayerIdleState(playerController));

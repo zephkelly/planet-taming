@@ -22,6 +22,9 @@ public class PlayerController : MonoBehaviour, IController
   private float attackCooldownTimer;
   private float invulnerabilityTimer;
 
+  public bool isSprinting;
+  public float sprintSpeed;
+
   public void Init(Controller c, StateManager sm, HealthManager hm)
   {
     controller = c;
@@ -94,6 +97,8 @@ public class PlayerController : MonoBehaviour, IController
   {
     inputs = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0);
     mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+    isSprinting = Input.GetKey(KeyCode.LeftShift);
 
     animator.SetFloat("inputX", inputs.x);
     animator.SetFloat("inputY", inputs.y);

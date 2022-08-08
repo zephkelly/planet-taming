@@ -14,6 +14,7 @@ public interface IHealth
 
 public class HealthManager
 {
+  public Controller hostController;
   public IHealth stats;
 
   public int maxHealth;
@@ -33,6 +34,8 @@ public class HealthManager
 
   public void Init(Controller c, HealthManager hm, IHealth stats, SpriteRenderer sr)
   {
+    hostController = c;
+
     this.stats = stats;
     stats.Init(c, hm, sr);
     
@@ -53,6 +56,7 @@ public class HealthManager
   public void TakeDamage(int damage,Transform attacker)
   {
     stats.TakeDamage(damage, attacker);
+    UpdateHealthBar(MaxHealth, Health);
   }
 
   public void Heal(int healing)
@@ -63,5 +67,10 @@ public class HealthManager
   public void Die(GameObject g)
   {
     stats.Die(g);
+  }
+
+  public void UpdateHealthBar(float maxHealth, float currentHealth)
+  {
+    hostController.healthBarSlider.fillAmount = currentHealth / maxHealth;
   }
 }
