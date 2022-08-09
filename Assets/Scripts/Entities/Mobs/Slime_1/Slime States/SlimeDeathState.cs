@@ -3,17 +3,21 @@ using UnityEngine;
 public class SlimeDeathState : IState
 {
     private Controller controller;
+    private Animator animator;
     private SpriteRenderer spriteRenderer;
 
     public SlimeDeathState(Controller c, SpriteRenderer r)
     {
       controller = c;
       spriteRenderer = r;
+
+      animator = controller.GetComponent<Animator>();
     }
 
     public void Entry()
     {
-      Debug.Log(controller.gameObject.tag + " is dead");
+      animator.SetBool("isDead", true);
+      
       controller.GetComponent<Collider2D>().enabled = false;
       spriteRenderer.color = Color.red;
     }

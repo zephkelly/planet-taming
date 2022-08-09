@@ -9,8 +9,8 @@ public class SlimeController : MonoBehaviour, IController
   public StateManager stateManager;
   public StatsManager statsManager;
 
-  public SlimeInteractionBehaviour slimeIB;
-
+  public CameraController cameraController;
+  private Animator animator;
   public Rigidbody2D rigid2D;
 
   private float invulnerabilityTimer;
@@ -29,6 +29,8 @@ public class SlimeController : MonoBehaviour, IController
 
   public void Start()
   {
+    cameraController = Camera.main.GetComponent<CameraController>();
+
     controller.healthBarCanvas.gameObject.SetActive(false);
 
     stateManager.ChangeState(new SlimeIdleState(controller));
@@ -40,24 +42,34 @@ public class SlimeController : MonoBehaviour, IController
   {
     stateManager.Update();
 
-    if (invulnerabilityTimer >= 0) invulnerabilityTimer -= Time.deltaTime; 
+    if (invulnerabilityTimer >= 0) invulnerabilityTimer -= Time.deltaTime;
+    if (controller.healthBarCanvas.gameObject.activeSelf) StartCoroutine(HideHealthbar());
   }
 
   public void OnTriggerEnter2D(Collider2D collider)
   {
-    Controller c = collider.GetComponent<Controller>();
-
     if (collider.tag != "Player") return;
     if (statsManager.Health <= 0) return;
     if (invulnerabilityTimer > 0) return;
 
-    if (c.IsAttacking)
+    Controller eCont = collider.GetComponent<Controller>();
+
+    if (eCont.IsAttacking)
     {
-      statsManager.TakeDamage(c.AttackDamage, collider.transform);
-      controller.healthBarCanvas.gameObject.SetActive(true);
       invulnerabilityTimer = 0.5f;
 
-      controller.rigid2D.AddForce((this.transform.position - collider.transform.position).normalized * c.knockback, ForceMode2D.Impulse);
+      Vector2 direction = (this.transform.position - collider.transform.position).normalized;
+
+      controller.healthBarCanvas.gameObject.SetActive(true);
+      statsManager.TakeDamage(eCont.AttackDamage, collider.transform);
+      cameraController.InvokeShake(0.20f, 25, 1.25f, new Vector2(0.5f, 0.5f));
+      controller.rigid2D.AddForce(direction * eCont.knockback, ForceMode2D.Impulse);
     }
+  }
+
+  IEnumerator HideHealthbar()
+  {
+    yield return new WaitForSeconds(20f); 
+    controller.healthBarCanvas.gameObject.SetActive(false);
   }
 }

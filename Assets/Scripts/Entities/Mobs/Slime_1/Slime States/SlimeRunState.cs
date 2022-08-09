@@ -3,6 +3,7 @@ using UnityEngine;
 public class SlimeRunState : IState
 {
     private Controller controller;
+    private Animator animator;
     private Transform attackingEntity;
     private Vector3 runDirection;
 
@@ -14,12 +15,16 @@ public class SlimeRunState : IState
     {
       controller = c;
       attackingEntity = t;
+
+      animator = controller.GetComponent<Animator>();
     }
 
     public void Entry()
     {
+      animator.SetBool("isRunning", true);
+
       timeTillJump = 0f;
-      runTime = Random.Range(10f, 14f);
+      runTime = Random.Range(11f, 13f);
 
       runDirection = (controller.transform.position - attackingEntity.position).normalized;
     }
@@ -35,6 +40,8 @@ public class SlimeRunState : IState
 
       return;
       }
+
+      animator.SetBool("isRunning", false);
 
       controller.stateManager.ChangeState(new SlimeIdleState(controller));
     }

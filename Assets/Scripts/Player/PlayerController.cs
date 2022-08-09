@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour, IController
   public Controller controller;
   public StateManager stateManager;
   public StatsManager statsManager;
+  private CameraController cameraController;
 
   public Rigidbody2D rigid2D;
   public SpriteRenderer spriteRenderer;
@@ -34,15 +35,18 @@ public class PlayerController : MonoBehaviour, IController
 
   public void Awake()
   {
-    controller = GetComponent<Controller>();
     rigid2D = controller.rigid2D;
     spriteRenderer = controller.spriteRenderer;
     audioSource = controller.audioSource; 
 
+    controller = GetComponent<Controller>();
     animator = GetComponent<Animator>();
   }
 
-  public void Start() => stateManager.ChangeState(new PlayerIdleState(controller));
+  public void Start()
+  {
+    stateManager.ChangeState(new PlayerIdleState(controller));
+  }
 
   public void Update()
   {

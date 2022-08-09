@@ -9,6 +9,13 @@ public class GameplayManager : MonoBehaviour
   [SerializeField] Transform playerSpawnPoint;
   private GameObject playerCurrent;
 
+  private CameraController mainCamera;
+
+  public void Awake()
+  {
+    mainCamera = cameraMain.GetComponent<CameraController>();
+  }
+
   public void Start()
   {
     playerCurrent = GameObject.FindGameObjectWithTag("Player");
@@ -24,7 +31,7 @@ public class GameplayManager : MonoBehaviour
       yield return new WaitForSeconds(3f);
 
       playerCurrent = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity);
-      cameraMain.GetComponent<CameraFollow>().ChangeFocus(playerCurrent.transform);
+      mainCamera.ChangeFocus(playerCurrent.transform);
 
       Debug.Log("Player respawned at: " + playerSpawnPoint.position);
     }

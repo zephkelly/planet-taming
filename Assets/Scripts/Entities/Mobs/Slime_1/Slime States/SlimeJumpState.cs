@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class SlimeJumpState : IState
 {
-  public Controller controller;
+  private Controller controller;
 
+  private Animator animator;
   private Vector3 moveDirection;
     private float moveDirX;
     private float moveDirY;
@@ -14,10 +15,13 @@ public class SlimeJumpState : IState
   public SlimeJumpState(Controller c)
   {
     controller = c;
+    animator = controller.GetComponent<Animator>();
   }
 
   public void Entry()
   {
+    animator.SetBool("isJumping", true);
+
     moveDirX = Random.Range(-1f, 1f);
     moveDirY = Random.Range(-1f, 1f);
     moveImpluseStrength = Random.Range(14f, 16f);
@@ -31,6 +35,8 @@ public class SlimeJumpState : IState
   {
     if (controller.rigid2D.velocity.magnitude < 0.1f)
     {
+      animator.SetBool("isJumping", false);
+      
       controller.stateManager.ChangeState(new SlimeIdleState(controller));
     }
   }
