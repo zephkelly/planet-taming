@@ -19,7 +19,8 @@ public class SlimeIdleState : IState
       animator.SetBool("isJumping", false);
       animator.SetBool("isRunning", false);
 
-      idleTime = Random.Range(2f, 4f);
+      idleTime = Random.Range(2f, 6f);
+
     }
 
     public void Update()
@@ -30,7 +31,19 @@ public class SlimeIdleState : IState
         return;
       }
       
-      controller.stateManager.ChangeState(new SlimeJumpState(controller));
+      int random = Random.Range(0, 3);
+
+      switch (random)
+      {
+        case 0:
+          controller.stateManager.ChangeState(new SlimeExploreState(controller));
+          break;
+        case 1:
+          controller.stateManager.ChangeState(new SlimeJumpState(controller));
+          break;
+      }
+
+      
     }
 
     public void FixedUpdate()

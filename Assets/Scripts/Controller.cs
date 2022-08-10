@@ -18,10 +18,10 @@ public class Controller : MonoBehaviour
   public IStats entityStats;
 
   public Rigidbody2D rigid2D;
+  public Animator animator;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
-  public Canvas healthBarCanvas; //need to set this manually
-  public Image healthBarSlider;
+  public Image healthBarSlider; //Set manually
 
   public int health;
   public float walkSpeed;
@@ -29,23 +29,11 @@ public class Controller : MonoBehaviour
   public int attackDamage;
   public bool isAttacking;
 
-  public int Health
-  {
-    get { return health; }
-    set { }
-  }
+  public int Health { get { return health; } }
 
-  public float WalkSpeed
-  {
-    get { return walkSpeed; }
-    set { }
-  }
+  public float WalkSpeed { get { return walkSpeed; } }
 
-  public int AttackDamage
-  {
-    get { return attackDamage; }
-    set { }
-  }
+  public int AttackDamage { get { return attackDamage; } }
 
   public bool IsAttacking
   {
@@ -64,6 +52,7 @@ public class Controller : MonoBehaviour
     rigid2D = GetComponent<Rigidbody2D>();
     spriteRenderer = GetComponent<SpriteRenderer>();
     audioSource = GetComponent<AudioSource>();
+    animator = GetComponent<Animator>();
 
     controllerBlueprint = GetComponent<IController>();
     entityStats = GetComponent<IStats>();
@@ -71,23 +60,12 @@ public class Controller : MonoBehaviour
     Init();
   }
 
-  public void Start()
-  {
-  }
-
-  public void Update()
-  {
-    stateManager.Update();
-  }
-
-  public void FixedUpdate()
-  {
-    stateManager.FixedUpdate();
-  }
-
   public void TakeDamage(int damage, Transform attacker)
   {
     statsManager.TakeDamage(damage, attacker);
   }
+
+  public void Update() => stateManager.Update();
+  public void FixedUpdate() => stateManager.FixedUpdate();
 }
 

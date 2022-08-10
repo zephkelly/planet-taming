@@ -15,6 +15,8 @@ public class CameraController : MonoBehaviour
 
   public void InvokeShake(float trauma, float freq, float recovSpeed, Vector2 maxShake)
   {
+    // Example: player hitting enemy
+    // camController.InvokeShake(0.35f, 25, 1.25f, new Vector2(0.5f, 0.5f));
     cameraShake.InvokeShake(trauma, freq, recovSpeed, maxShake);
   }
 

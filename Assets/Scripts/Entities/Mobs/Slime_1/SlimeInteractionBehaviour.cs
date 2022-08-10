@@ -7,9 +7,12 @@ public class SlimeInteractionBehaviour : MonoBehaviour
   private Controller controller;
   private SlimeStats slimeStats;
 
-  public Animator emoteAnimator;
+  private Transform ourTransform;
 
-  private LayerMask slimeLayerMask;
+  public Animator emoteAnimator; //Ref by slimeinteractionstate
+  private SpriteRenderer emoteSprite;
+
+  private LayerMask slimeRaycastMask;
   public int interactionTendency;
   public float interactionTendencyTimer;
   public bool isInteracting = false;
@@ -21,6 +24,8 @@ public class SlimeInteractionBehaviour : MonoBehaviour
     //Need the emote animator so the slimeinteractstate can access it
     if (emoteAnimator == null) emoteAnimator = GameObject.FindGameObjectWithTag("Emote").GetComponent<Animator>();
 
+    emoteSprite = emoteAnimator.GetComponent<SpriteRenderer>();
+
     controller = gameObject.GetComponent<Controller>();
     slimeStats = gameObject.GetComponent<SlimeStats>();
   }
@@ -29,7 +34,9 @@ public class SlimeInteractionBehaviour : MonoBehaviour
   {
     interactionTendencyTimer = 0;
 
-    slimeLayerMask = 1 << LayerMask.NameToLayer("Slime");
+    DisableEmote();
+
+    slimeRaycastMask = 1 << LayerMask.NameToLayer("Slime");
   }
 
   public void Update()
@@ -46,22 +53,25 @@ public class SlimeInteractionBehaviour : MonoBehaviour
 
     RaycastHit2D[] hit = Physics2D.CircleCastAll
     (
-      transform.position, 
-      Random.Range(2f, 5f), 
-      Vector2.zero, 0f, slimeLayerMask
+      transform.position,
+      Random.Range(2f, 5f),
+      Vector2.zero, 0f, slimeRaycastMask
     );
 
     for (int i = 0; i < hit.Length; i++) //Searching through hit[]
     {
-      if (hit[i].collider.gameObject == this.gameObject) return; //If object is ourself ignore
+      GameObject hitGameObject = hit[i].collider.gameObject;
+
+      //Check if object is a slime, and also if we arent hitting ourselves...
+      if (hitGameObject.tag != "Slime" || hitGameObject == this.gameObject) return;
 
       //If other slime wants to interact as well then invoke interact state on both
-      if (hit[i].collider.GetComponent<SlimeInteractionBehaviour>().interactionTendency == 1)
+      if (hitGameObject.GetComponent<SlimeInteractionBehaviour>().interactionTendency == 1)
       {
-        controller.stateManager.ChangeState
-          (new SlimeInteractionState(controller, hit[i].collider.GetComponent<Controller>()));
-        hit[i].collider.GetComponent<Controller>().stateManager.ChangeState
-          (new SlimeInteractionState(hit[i].collider.GetComponent<Controller>(), controller));
+        Controller otherController = hit[i].collider.GetComponent<Controller>();
+
+        controller.stateManager.ChangeState(new SlimeInteractionState(controller, otherController, this));
+        otherController.stateManager.ChangeState(new SlimeInteractionState(otherController, controller, this));
 
         break;
       }
@@ -73,4 +83,7 @@ public class SlimeInteractionBehaviour : MonoBehaviour
     interactionTendency = Random.Range(0, Random.Range(8, 13));
     interactionTendencyTimer = 5f;
   }
+
+  public void EnableEmote() => emoteSprite.enabled = true;
+  public void DisableEmote() => emoteSprite.enabled = false;
 }

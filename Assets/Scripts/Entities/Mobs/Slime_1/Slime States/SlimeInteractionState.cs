@@ -2,50 +2,47 @@ using UnityEngine;
 
 public class SlimeInteractionState : IState
 {
-  private SlimeInteractionBehaviour ourBehaviour;
+  private SlimeInteractionBehaviour ourInteractionBehaviour;
   private Controller ourController;
   private Controller friendController;
 
-  private SpriteRenderer emoteBubbleSprite;
-  private Animator animator;
-  private Animator emoteBubble;
-
+  private Animator slimeAnimator;
+  private Animator emoteAnimator;
+  //private SpriteRenderer emoteSprite;
   private Transform ourTransform;
   private Transform friendTransform;
-
   private Vector3 interactionLocation;
   private Vector3 locationDirection;
+
   private float locationDistance;
   private float _refVelocity;
-
   private float conversationTime;
-  private float timeTillEmote;
-  private float idleTime;
+  private float idleBeforeInteraction;
 
+  private float timeTillEmote;
   private bool canEmote;
   private bool isEmoting;
 
-  public SlimeInteractionState(Controller us, Controller friend)
+  public SlimeInteractionState(Controller us, Controller friend, SlimeInteractionBehaviour slimeBehaviour)
   {
     ourController = us;
     friendController = friend;
 
-    ourBehaviour = ourController.GetComponent<SlimeInteractionBehaviour>();
-    animator = ourController.GetComponent<Animator>();
-    
-    emoteBubble = ourBehaviour.emoteAnimator;
-    emoteBubbleSprite = emoteBubble.GetComponent<SpriteRenderer>();
+    ourInteractionBehaviour = slimeBehaviour;
 
-    emoteBubbleSprite.enabled = false;
+    slimeAnimator = ourController.animator;
+    emoteAnimator = ourInteractionBehaviour.emoteAnimator;
+
     isEmoting = false;
-    //emoteBubble.gameObject.SetActive(false);
   }
 
   public void Entry()
   {
+    ourInteractionBehaviour.DisableEmote();
+
     //Making sure were in the correct animation state
-    animator.SetBool("isJumping", false);
-    animator.SetBool("isRunning", false);
+    slimeAnimator.SetBool("isJumping", false);
+    slimeAnimator.SetBool("isRunning", false);
 
     //Random chance to use an emote bubble
     canEmote = Random.Range(0, 3) == 0 ? true : false;
@@ -53,7 +50,7 @@ public class SlimeInteractionState : IState
     if (canEmote)
     {
       int num = Random.Range(1, 3);
-      emoteBubble.SetInteger("randomNum", num);
+      emoteAnimator.SetInteger("randomNum", num);
 
       timeTillEmote = Random.Range(5f, 7f);
     }
@@ -65,10 +62,10 @@ public class SlimeInteractionState : IState
     interactionLocation = (friendTransform.position + ourTransform.position) / 2;
 
     //Setting up our behaviour
-    ourBehaviour.isInteracting = true;
-    ourBehaviour.interactionTendency = 0;
+    ourInteractionBehaviour.isInteracting = true;
+    ourInteractionBehaviour.interactionTendency = 0;
     conversationTime = Random.Range(15f, 20f);
-    idleTime = Random.Range(0.5f, 5f);
+    idleBeforeInteraction = Random.Range(0.5f, 5f);
   }
 
   public void Update()
@@ -78,12 +75,13 @@ public class SlimeInteractionState : IState
     locationDirection = (interactionLocation - ourTransform.position);
     locationDistance = Vector3.Distance(ourTransform.position, interactionLocation);
 
-    if(idleTime > 0) idleTime -= Time.deltaTime;
+    if(idleBeforeInteraction > 0) idleBeforeInteraction -= Time.deltaTime;
 
     if (conversationTime < 0)
     {
-      ourBehaviour.isInteracting = false;
+      ourInteractionBehaviour.isInteracting = false;
 
+      //Maybe we jump out of convo, maybe we idle
       switch (Random.Range(0, 1))
       {
         case 0:
@@ -100,7 +98,7 @@ public class SlimeInteractionState : IState
   {
     //If we are at the location, we can stop moving and
     //start the conversation and emoting
-    if (locationDistance <= ourBehaviour.interactionSize) 
+    if (locationDistance <= ourInteractionBehaviour.interactionSize) 
     { 
       conversationTime -= Time.deltaTime;
 
@@ -109,12 +107,12 @@ public class SlimeInteractionState : IState
         if (timeTillEmote > 0) timeTillEmote -= Time.deltaTime;
         else
         {
-          //One frame trigger to animator
+          //One frame trigger to slimeAnimator
           if (isEmoting == true) return;
           isEmoting = true;
-          
-          emoteBubbleSprite.enabled = true;
-          emoteBubble.SetTrigger("startEmote");
+          Debug.Log("Enabling emote");
+          ourInteractionBehaviour.EnableEmote();
+          emoteAnimator.SetTrigger("startEmote");
         }
       }
 
@@ -122,13 +120,17 @@ public class SlimeInteractionState : IState
     }
 
     //This is the short delay the slime has before moving to location
-    if (idleTime > 0) return; 
+    if (idleBeforeInteraction > 0) return; 
 
-    ourController.rigid2D.AddForce(locationDirection * Mathf.SmoothDamp(0.6f, ourController.walkSpeed * 2, ref _refVelocity, 0.05f), ForceMode2D.Force);
+    ourController.rigid2D.AddForce
+    (
+      locationDirection * Mathf.SmoothDamp(0.6f, ourController.walkSpeed * 2, ref _refVelocity, 0.05f),
+      ForceMode2D.Force
+    );
   }
 
   public void Exit()
   {
-    emoteBubbleSprite.enabled = false;
+    ourInteractionBehaviour.DisableEmote();
   }
 }

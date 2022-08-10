@@ -14,10 +14,7 @@ public class StateManager
 
   public void ChangeState(IState newState)
   {
-    if (currentState != null)
-    {
-      currentState.Exit();
-    }
+    if (currentState != null) currentState.Exit();
 
     currentState = newState;
     currentState.Entry();
@@ -25,20 +22,14 @@ public class StateManager
 
   public void Update()
   {
-    if (currentState == null)
-    {
-      return;
-    }
+    if (currentState == null) return;
 
     currentState.Update();
   }
 
   public void FixedUpdate()
   {
-    if (currentState == null)
-    {
-      return;
-    }
+    if (currentState == null) return;
 
     currentState.FixedUpdate();
   }

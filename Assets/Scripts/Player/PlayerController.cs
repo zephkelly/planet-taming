@@ -108,7 +108,6 @@ public class PlayerController : MonoBehaviour, IController
     animator.SetFloat("inputY", inputs.y);
 
     if (inputs == Vector3.zero) return;
-
     animator.SetFloat("lastX", inputs.x);
     animator.SetFloat("lastY", inputs.y);
   }

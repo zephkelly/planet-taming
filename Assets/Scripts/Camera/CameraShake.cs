@@ -18,11 +18,11 @@ public class CameraShake : MonoBehaviour
       cameraTransform = this.GetComponent<Transform>();
   }
 
-  void Update()
+  void LateUpdate()
   {
     if (trauma <= 0) return;
     
-    transform.localPosition += new Vector3
+    cameraTransform.localPosition += new Vector3
       (
         maximumShake.x * (Mathf.PerlinNoise(shakeSeed, Time.time * frequency) * 2-1),
         maximumShake.y * (Mathf.PerlinNoise(shakeSeed + 1, Time.time * frequency) * 2-1),

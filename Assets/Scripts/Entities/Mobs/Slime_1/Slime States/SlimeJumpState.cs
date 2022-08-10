@@ -5,30 +5,36 @@ using UnityEngine;
 public class SlimeJumpState : IState
 {
   private Controller controller;
+  private SlimeController slimeController;
 
   private Animator animator;
-  private Vector3 moveDirection;
-    private float moveDirX;
-    private float moveDirY;
-  private float moveImpluseStrength;
+  private Vector3 lastJumpDirection;
+  private Vector3 jumpDirection;
+
+  private float moveDirX;
+  private float moveDirY;
+  private float impulseStrength;
 
   public SlimeJumpState(Controller c)
   {
     controller = c;
+
+    slimeController = controller.GetComponent<SlimeController>();
     animator = controller.GetComponent<Animator>();
+
+    impulseStrength = slimeController.JumpStrength;
+    lastJumpDirection = slimeController.LastJumpDirection;
   }
 
   public void Entry()
   {
     animator.SetBool("isJumping", true);
 
-    moveDirX = Random.Range(-1f, 1f);
-    moveDirY = Random.Range(-1f, 1f);
-    moveImpluseStrength = Random.Range(14f, 16f);
+    Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
 
-    moveDirection = new Vector3(moveDirX, moveDirY, 0f);
-
-    controller.rigid2D.AddForce(moveDirection * moveImpluseStrength, ForceMode2D.Impulse);
+    jumpDirection = (lastJumpDirection + randomDirection) / 2;
+    
+    controller.rigid2D.AddForce(jumpDirection * impulseStrength, ForceMode2D.Impulse);
   }
 
   public void Update()
