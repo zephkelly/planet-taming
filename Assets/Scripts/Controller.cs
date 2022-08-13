@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 public interface IController
 {
@@ -17,6 +18,8 @@ public class Controller : MonoBehaviour
   public IController controllerBlueprint;
   public IStats entityStats;
 
+  public NavMeshAgent navMeshAgent;
+  public Transform objectTransform;
   public Rigidbody2D rigid2D;
   public Animator animator;
   public SpriteRenderer spriteRenderer;
@@ -49,6 +52,8 @@ public class Controller : MonoBehaviour
 
   public void Awake()
   {
+    navMeshAgent = GetComponent<NavMeshAgent>();
+    objectTransform = gameObject.GetComponent<Transform>();
     rigid2D = GetComponent<Rigidbody2D>();
     spriteRenderer = GetComponent<SpriteRenderer>();
     audioSource = GetComponent<AudioSource>();

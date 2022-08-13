@@ -1,20 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SlimeInteractionBehaviour : MonoBehaviour
 {
+  private SlimeController slimeController;
   private Controller controller;
   private SlimeStats slimeStats;
 
-  private Transform ourTransform;
-
   public Animator emoteAnimator; //Ref by slimeinteractionstate
+  private Transform ourTransform;
   private SpriteRenderer emoteSprite;
+  private LayerMask entitiesLayerMask;
 
-  private LayerMask slimeRaycastMask;
   public int interactionTendency;
-  public float interactionTendencyTimer;
+  public float timeTillInteractionUpdate;
   public bool isInteracting = false;
 
   public float interactionSize = 0.6f;
@@ -26,17 +24,18 @@ public class SlimeInteractionBehaviour : MonoBehaviour
 
     emoteSprite = emoteAnimator.GetComponent<SpriteRenderer>();
 
+    slimeController = gameObject.GetComponent<SlimeController>();
     controller = gameObject.GetComponent<Controller>();
     slimeStats = gameObject.GetComponent<SlimeStats>();
   }
 
   public void Start()
   {
-    interactionTendencyTimer = 0;
+    timeTillInteractionUpdate = 0;
 
     DisableEmote();
 
-    slimeRaycastMask = 1 << LayerMask.NameToLayer("Slime");
+    entitiesLayerMask = 1 << LayerMask.NameToLayer("Entity");
   }
 
   public void Update()
@@ -45,33 +44,38 @@ public class SlimeInteractionBehaviour : MonoBehaviour
     if (isInteracting) return;
 
     //Interaction loop
-    interactionTendencyTimer -= Time.deltaTime;
-    if (interactionTendencyTimer <= 0) UpdateInteraction();
+    if (timeTillInteractionUpdate <= 0) UpdateInteraction();
+    timeTillInteractionUpdate -= Time.deltaTime;
 
-    //Only raycast if we wat to interact
+    //Only raycast if we want to interact
     if (interactionTendency != 1) return;
 
-    RaycastHit2D[] hit = Physics2D.CircleCastAll
-    (
-      transform.position,
-      Random.Range(2f, 5f),
-      Vector2.zero, 0f, slimeRaycastMask
-    );
+    RaycastHit2D[] hit = Physics2D.CircleCastAll(
+        transform.position,
+        Random.Range(2f, 5f),
+        Vector2.zero, 0f,
+        entitiesLayerMask);
 
     for (int i = 0; i < hit.Length; i++) //Searching through hit[]
     {
       GameObject hitGameObject = hit[i].collider.gameObject;
 
-      //Check if object is a slime, and also if we arent hitting ourselves...
-      if (hitGameObject.tag != "Slime" || hitGameObject == this.gameObject) return;
+      if (!hitGameObject.CompareTag("Slime")) return;
+      if (hitGameObject == this.gameObject) return;
+
+      hitGameObject.TryGetComponent(out SlimeInteractionBehaviour sIB);
+      SlimeInteractionBehaviour otherSlimeBehaviour = sIB;
 
       //If other slime wants to interact as well then invoke interact state on both
-      if (hitGameObject.GetComponent<SlimeInteractionBehaviour>().interactionTendency == 1)
+      if (otherSlimeBehaviour.interactionTendency == 1)
       {
         Controller otherController = hit[i].collider.GetComponent<Controller>();
 
-        controller.stateManager.ChangeState(new SlimeInteractionState(controller, otherController, this));
-        otherController.stateManager.ChangeState(new SlimeInteractionState(otherController, controller, this));
+        controller.stateManager.ChangeState(new SlimeInteractionState(controller, slimeController, otherController, this));
+        otherController.stateManager.ChangeState(new SlimeInteractionState(otherController, 
+                                                                           otherController.GetComponent<SlimeController>(),
+                                                                           controller,
+                                                                           otherController.GetComponent<SlimeInteractionBehaviour>()));
 
         break;
       }
@@ -81,7 +85,7 @@ public class SlimeInteractionBehaviour : MonoBehaviour
   public void UpdateInteraction()
   {
     interactionTendency = Random.Range(0, Random.Range(8, 13));
-    interactionTendencyTimer = 5f;
+    timeTillInteractionUpdate = 5f;
   }
 
   public void EnableEmote() => emoteSprite.enabled = true;

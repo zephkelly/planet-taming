@@ -3,6 +3,7 @@ using UnityEngine;
 public class SlimeInteractionState : IState
 {
   private SlimeInteractionBehaviour ourInteractionBehaviour;
+  private SlimeController slimeController;
   private Controller ourController;
   private Controller friendController;
 
@@ -23,12 +24,13 @@ public class SlimeInteractionState : IState
   private bool canEmote;
   private bool isEmoting;
 
-  public SlimeInteractionState(Controller us, Controller friend, SlimeInteractionBehaviour slimeBehaviour)
+  public SlimeInteractionState(Controller us, SlimeController sc, Controller friend, SlimeInteractionBehaviour slimeBehaviour)
   {
     ourController = us;
     friendController = friend;
 
     ourInteractionBehaviour = slimeBehaviour;
+    slimeController = sc;
 
     slimeAnimator = ourController.animator;
     emoteAnimator = ourInteractionBehaviour.emoteAnimator;
@@ -52,7 +54,7 @@ public class SlimeInteractionState : IState
       int num = Random.Range(1, 3);
       emoteAnimator.SetInteger("randomNum", num);
 
-      timeTillEmote = Random.Range(5f, 7f);
+      timeTillEmote = Random.Range(3f, 5f);
     }
 
     ourTransform = ourController.transform;
@@ -65,7 +67,7 @@ public class SlimeInteractionState : IState
     ourInteractionBehaviour.isInteracting = true;
     ourInteractionBehaviour.interactionTendency = 0;
     conversationTime = Random.Range(15f, 20f);
-    idleBeforeInteraction = Random.Range(0.5f, 5f);
+    idleBeforeInteraction = Random.Range(0.5f, 4f);
   }
 
   public void Update()
@@ -85,10 +87,10 @@ public class SlimeInteractionState : IState
       switch (Random.Range(0, 1))
       {
         case 0:
-          ourController.stateManager.ChangeState(new SlimeIdleState(ourController));
+          ourController.stateManager.ChangeState(new SlimeIdleState(ourController, slimeController));
           break;
         case 1:      
-          ourController.stateManager.ChangeState(new SlimeJumpState(ourController));
+          ourController.stateManager.ChangeState(new SlimeJumpState(ourController, slimeController));
           break;
       }
     }
@@ -110,7 +112,6 @@ public class SlimeInteractionState : IState
           //One frame trigger to slimeAnimator
           if (isEmoting == true) return;
           isEmoting = true;
-          Debug.Log("Enabling emote");
           ourInteractionBehaviour.EnableEmote();
           emoteAnimator.SetTrigger("startEmote");
         }

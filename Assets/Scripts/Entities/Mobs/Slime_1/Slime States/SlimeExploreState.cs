@@ -1,87 +1,52 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SlimeExploreState : IState
 {
   private SlimeController slimeController;
   private Controller controller;
-  private Transform slimeTransform;
 
-  private Vector2 exploreDirection;
-  private LayerMask colliderLayerMask;
+  private Vector3 exploreDirection;
 
-  private float exploreTimer;
-  private float collisionRayLength = 0.5f;
+  //if the slime is stuck, we will exit after timer incase
+  private float exitTimer = 10f; 
 
-  public SlimeExploreState(Controller c)
+  public SlimeExploreState(Controller c, SlimeController sc)
   {
     controller = c;
-    slimeController = c.GetComponent<SlimeController>();
-
-    colliderLayerMask = 1 << LayerMask.NameToLayer("Collidable");
+    slimeController = sc;
   }
 
   public void Entry()
   {
-    slimeTransform = controller.transform;
-    exploreTimer = slimeController.ExploreLength;
+    Vector3 randomPosition = new Vector3(Random.Range(-6f, 6f), Random.Range(-6f, 6f), 0);
 
-    exploreDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+    controller.navMeshAgent.SetDestination(controller.objectTransform.position + randomPosition);
   }
 
   public void Update()
-  {
-    UpdateState();
+  { 
+    ShouldWeIdle();
 
-    FireCircleCast();
+    exploreDirection = controller.navMeshAgent.steeringTarget - controller.objectTransform.position;
+    exploreDirection.Normalize(); 
   }
-
-
+  
   public void FixedUpdate()
   {
-    controller.rigid2D.AddForce(exploreDirection * controller.walkSpeed, ForceMode2D.Force);
+    controller.rigid2D.AddForce(exploreDirection * controller.WalkSpeed, ForceMode2D.Force);
+  }
+
+  private void ShouldWeIdle()
+  {
+    exitTimer -= Time.deltaTime;
+
+    if(controller.navMeshAgent.remainingDistance > 0.1f || exitTimer > 0) return;
+    controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
   }
 
   public void Exit()
   {
-
-  }
-
-  private void FireCircleCast()
-  {
-    RaycastHit2D[] hits = Physics2D.CircleCastAll(slimeTransform.position, collisionRayLength, Vector2.zero, 0f, colliderLayerMask);
-
-    for (int i = 0; i < hits.Length; i++)
-    {
-      RaycastHit2D hit = hits[i];
-      Collider2D hitCollider = hit.collider;
-
-      Vector2 normal = hit.normal;
-      Vector2 perpendicular = Vector2.Perpendicular(normal);
-      float dot = Vector2.Dot(exploreDirection, normal); //Dot is how much we are looking at a wall
-
-      //If we are veering towards wall...
-      if (dot < 0)
-      {
-        exploreDirection = Vector2.Reflect(exploreDirection, normal);
-      }
-      
-      //If we are looking at wall...
-      if (dot < -0.8f)
-      {
-        Vector2 _ref = Vector2.zero;
-        exploreDirection = Vector2.SmoothDamp(exploreDirection, perpendicular, ref _ref, 0.3f);
-      }
-    }
-  }
-
-  private void UpdateState()
-  {
-    while (exploreTimer > 0)
-    {
-      exploreTimer -= Time.deltaTime;
-      return;
-    }
-
-    controller.stateManager.ChangeState(new SlimeIdleState(controller));
+    controller.navMeshAgent.ResetPath();
   }
 }

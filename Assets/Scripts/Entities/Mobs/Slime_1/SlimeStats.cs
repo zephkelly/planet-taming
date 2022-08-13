@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SlimeStats : MonoBehaviour, IStats
 {
+  private SlimeController slimeController;
   private Controller controller;
   private StatsManager statsManager;
   private SpriteRenderer spriteRenderer;
@@ -15,6 +16,11 @@ public class SlimeStats : MonoBehaviour, IStats
     spriteRenderer = s;
   }
 
+  public void Start()
+  {
+    slimeController = controller.GetComponent<SlimeController>();
+  }
+
   public void TakeDamage(int damage, Transform attacker)
   {
     if (statsManager.Health <= 0)
@@ -24,7 +30,7 @@ public class SlimeStats : MonoBehaviour, IStats
       return;
     }
 
-    controller.stateManager.ChangeState(new SlimeRunState(controller, attacker));
+    controller.stateManager.ChangeState(new SlimeRunState(controller, slimeController, attacker));
 
     StartCoroutine(FlashRed());
 

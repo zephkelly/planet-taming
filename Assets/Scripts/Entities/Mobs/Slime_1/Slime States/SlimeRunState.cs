@@ -1,68 +1,85 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SlimeRunState : IState
 {
+    private SlimeController slimeController;
     private Controller controller;
-    private Animator animator;
-    private Transform attackingEntity;
+
+    private Vector3 magnitudeFromAttacker;
     private Vector3 runDirection;
+    private Transform attackingEntity;
 
-    private float runTime;
-    private float timeTillJump;
-    private float moveImpluseStrength;
+    private float _runTime;
+    private float _timeTillJump;
+    private float _jumpStrength;
 
-    public SlimeRunState(Controller c, Transform t)
+    public SlimeRunState(Controller c, SlimeController sc, Transform t)
     {
       controller = c;
+      slimeController = sc;
       attackingEntity = t;
-
-      animator = controller.GetComponent<Animator>();
     }
 
     public void Entry()
     {
-      animator.SetBool("isRunning", true);
+      _runTime = slimeController.RunTime;
+      _timeTillJump = slimeController.TimeTillNextJump;
 
-      timeTillJump = 0f;
-      runTime = Random.Range(11f, 13f);
+      controller.animator.SetBool("isRunning", true);
 
-      runDirection = (controller.transform.position - attackingEntity.position).normalized;
+      //Need to update the destination before we jump
+      GetNewForwardDestination();
     }
 
     public void Update()
     {
-      while (runTime > 0)
-      {
-        runTime -= Time.deltaTime;
-        timeTillJump -= Time.deltaTime;
+      Debug.DrawRay(controller.objectTransform.position, runDirection * 1f, Color.red);
 
-        if (timeTillJump <= 0) Jump();
+      //Which direction should we jump?
+      runDirection = controller.navMeshAgent.steeringTarget - controller.objectTransform.position;
+      runDirection.z = 0;
+      runDirection.Normalize();
 
-      return;
-      }
-
-      animator.SetBool("isRunning", false);
-
-      controller.stateManager.ChangeState(new SlimeIdleState(controller));
+      ShouldWeJump();
+      ShouldWeIdle();
     }
 
-    public void FixedUpdate()
+    private void GetNewForwardDestination()
     {
+      magnitudeFromAttacker = (controller.objectTransform.position - attackingEntity.position);
+      magnitudeFromAttacker.Normalize();
 
+      controller.navMeshAgent.SetDestination(controller.objectTransform.position + (magnitudeFromAttacker * slimeController.RunDistance));
     }
+
+    public void ShouldWeJump()
+    {
+      _timeTillJump -= Time.deltaTime;
+      if (_timeTillJump > 0) return;
+
+      _timeTillJump = slimeController.TimeTillNextJump;
+      _jumpStrength = slimeController.JumpStrength;
+
+      controller.rigid2D.AddForce(runDirection * _jumpStrength, ForceMode2D.Impulse);
+
+      GetNewForwardDestination(); //Update the new destination after we jump
+    }
+
+    private void ShouldWeIdle()
+    {
+      _runTime -= Time.deltaTime;
+      if (controller.navMeshAgent.remainingDistance < 0.1f || _runTime < 0)
+      {
+        controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
+      }
+    }
+
+    public void FixedUpdate() { }
 
     public void Exit()
     {
-
-    }
-
-    public void Jump()
-    {
-      timeTillJump = Random.Range(0.5f, 1.2f);
-      moveImpluseStrength = Random.Range(12f, 14f);
-
-      controller.rigid2D.AddForce(runDirection * moveImpluseStrength, ForceMode2D.Impulse);
-
-      runDirection = (controller.transform.position - attackingEntity.position).normalized;
+      controller.navMeshAgent.ResetPath();
+      controller.animator.SetBool("isRunning", false);
     }
 }

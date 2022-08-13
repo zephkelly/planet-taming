@@ -2,25 +2,20 @@ using UnityEngine;
 
 public class SlimeIdleState : IState
 {
+    private SlimeController slimeController;
     private Controller controller;
-    private Animator animator;
 
     private float idleTime;
 
-    public SlimeIdleState(Controller c)
+    public SlimeIdleState(Controller c, SlimeController sc)
     {
       controller = c;
-
-      animator = controller.GetComponent<Animator>();
+      slimeController = sc;
     }
 
     public void Entry()
     {
-      animator.SetBool("isJumping", false);
-      animator.SetBool("isRunning", false);
-
       idleTime = Random.Range(2f, 6f);
-
     }
 
     public void Update()
@@ -30,20 +25,18 @@ public class SlimeIdleState : IState
         idleTime -= Time.deltaTime;
         return;
       }
-      
-      int random = Random.Range(0, 3);
+
+      int random = Random.Range(0, 5);
 
       switch (random)
       {
         case 0:
-          controller.stateManager.ChangeState(new SlimeExploreState(controller));
+          controller.stateManager.ChangeState(new SlimeExploreState(controller, slimeController));
           break;
-        case 1:
-          controller.stateManager.ChangeState(new SlimeJumpState(controller));
+        default:
+          controller.stateManager.ChangeState(new SlimeJumpState(controller, slimeController));
           break;
       }
-
-      
     }
 
     public void FixedUpdate()
