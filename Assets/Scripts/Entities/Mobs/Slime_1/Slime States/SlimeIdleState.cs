@@ -15,7 +15,7 @@ public class SlimeIdleState : IState
 
     public void Entry()
     {
-      idleTime = Random.Range(2f, 6f);
+      idleTime = Random.Range(0.5f, 6f);
     }
 
     public void Update()
@@ -34,18 +34,12 @@ public class SlimeIdleState : IState
           controller.stateManager.ChangeState(new SlimeExploreState(controller, slimeController));
           break;
         default:
-          controller.stateManager.ChangeState(new SlimeJumpState(controller, slimeController));
+          Debug.Log("We would have jumped");
+          //controller.stateManager.ChangeState(new SlimeJumpState(controller, slimeController));
           break;
       }
     }
 
-    public void FixedUpdate()
-    {
-
-    }
-
-    public void Exit()
-    {
-
-    }
+    public void FixedUpdate() { }
+    public void Exit() { }
 }

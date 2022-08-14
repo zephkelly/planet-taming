@@ -27,11 +27,6 @@ public class PlayerOwchState : IState
     }
   }
 
-  public void FixedUpdate()
-  {
-  }
-
-  public void Exit()
-  {
-  }
+  public void FixedUpdate() { }
+  public void Exit() { }
 }

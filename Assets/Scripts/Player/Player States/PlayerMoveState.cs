@@ -33,7 +33,5 @@ public class PlayerMoveState : IState
     playerController.rigid2D.AddForce(playerController.inputs.normalized * playerController.controller.WalkSpeed, ForceMode2D.Impulse);
   }
 
-  public void Exit()
-  {
-  }
+  public void Exit() { }
 }

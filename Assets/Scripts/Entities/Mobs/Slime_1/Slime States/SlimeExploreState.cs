@@ -25,8 +25,10 @@ public class SlimeExploreState : IState
   }
 
   public void Update()
-  { 
-    ShouldWeIdle();
+  {
+    ExploreTimer();
+
+    AreWeThereYet();
 
     exploreDirection = controller.navMeshAgent.steeringTarget - controller.objectTransform.position;
     exploreDirection.Normalize(); 
@@ -34,14 +36,20 @@ public class SlimeExploreState : IState
   
   public void FixedUpdate()
   {
-    controller.rigid2D.AddForce(exploreDirection * controller.WalkSpeed, ForceMode2D.Force);
+    //controller.rigid2D.AddForce(exploreDirection * controller.WalkSpeed, ForceMode2D.Force);
   }
 
-  private void ShouldWeIdle()
+  private void ExploreTimer()
   {
     exitTimer -= Time.deltaTime;
 
-    if(controller.navMeshAgent.remainingDistance > 0.1f || exitTimer > 0) return;
+    if(exitTimer > 0) return;
+    controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
+  }
+
+  private void AreWeThereYet()
+  {
+    if(controller.navMeshAgent.remainingDistance > 0.1f) return;
     controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
   }
 

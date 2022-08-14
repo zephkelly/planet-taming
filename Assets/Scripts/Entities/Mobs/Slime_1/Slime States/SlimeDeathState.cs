@@ -10,30 +10,19 @@ public class SlimeDeathState : IState
     {
       controller = c;
       spriteRenderer = r;
-
-      animator = controller.GetComponent<Animator>();
     }
 
     public void Entry()
     {
-      animator.SetBool("isDead", true);
+      controller.animator.SetBool("isDead", true);
       
       controller.GetComponent<Collider2D>().enabled = false;
       spriteRenderer.color = Color.red;
+
+      controller.statsManager.Die(controller.gameObject);
     }
 
-    public void Update()
-    {
-
-    }
-
-    public void FixedUpdate()
-    {
-
-    }
-
-    public void Exit()
-    {
-
-    }
+    public void Update() { }
+    public void FixedUpdate() { }
+    public void Exit() { }
 }

@@ -5,11 +5,11 @@ using UnityEngine;
 public interface IStats
 {
   void Init(Controller c, StatsManager statsm, SpriteRenderer sr);
-  void TakeDamage(int damage, Transform attacker);
+  int MaxHealth();
+  int Health();
+  void TakeDamage(int damage, Controller attacker);
   void Heal(int healing);
   void Die(GameObject g);
-  
-  //void ApplyDebuff(Debuff debuff);
 }
 
 public class StatsManager
@@ -17,63 +17,24 @@ public class StatsManager
   public Controller hostController;
   public IStats entityStats;
 
-  public int maxHealth;
-  public int health;
-  public int knockback;
+  public int MaxHealth { get { return entityStats.MaxHealth(); } }
+  public int Health { get { return entityStats.Health(); }}
 
-  public int MaxHealth
-  {
-    get { return maxHealth; }
-    set { maxHealth = value; }
-  }
-
-  public int Health
-  {
-    get { return health; }
-    set { health = value; }
-  }
-
-  public void Init(Controller c, StatsManager statsm, IStats entityStats, SpriteRenderer sr)
+  public void Init(Controller c, StatsManager sm, IStats entityStats, SpriteRenderer sr)
   {
     hostController = c;
 
     this.entityStats = entityStats;
-    entityStats.Init(c, statsm, sr);
-
-    knockback = c.knockback;
-    maxHealth = c.health;
-    health = maxHealth;
+    entityStats.Init(c, sm, sr);
   }
 
-  public void SetMaxHealth(int maxHealth)
+  public void TakeDamage(int damage, Controller attacker)
   {
-    this.maxHealth = maxHealth;
-  }
-
-  public void SetCurrentHealth(int health)
-  {
-    this.health = health;
-  }
-
-  public void TakeDamage(int damage,Transform attacker)
-  {
-    health -= damage;
     entityStats.TakeDamage(damage, attacker);
-    UpdateHealthBar(maxHealth, health);
+    UpdateHealthBar(MaxHealth, Health);
   }
 
-  public void Heal(int healing)
-  {
-    entityStats.Heal(healing);
-  }
-
-  public void Die(GameObject g)
-  {
-    entityStats.Die(g);
-  }
-
-  public void UpdateHealthBar(float maxHealth, float currentHealth)
-  {
-    hostController.healthBarSlider.fillAmount = currentHealth / maxHealth;
-  }
+  public void Heal(int healing) => entityStats.Heal(healing);
+  public void Die(GameObject g) => entityStats.Die(g);
+  public void UpdateHealthBar(float maxHealth, float currentHealth) => hostController.healthBarSlider.fillAmount = currentHealth / maxHealth;
 }

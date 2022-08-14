@@ -7,42 +7,47 @@ public class SlimeStats : MonoBehaviour, IStats
   private SlimeController slimeController;
   private Controller controller;
   private StatsManager statsManager;
+
+  [SerializeField] int maxHealth = 30;
+  [SerializeField] int currentHealth;
+
   private SpriteRenderer spriteRenderer;
+  private WaitForSeconds invulnerabilityDuration = new WaitForSeconds(0.4f);
+
+  public int MaxHealth() => maxHealth;
+  public int Health() => currentHealth;
 
   public void Init (Controller c, StatsManager sm, SpriteRenderer s)
   {
     controller = c;
     statsManager = sm;
     spriteRenderer = s;
-  }
 
-  public void Start()
-  {
     slimeController = controller.GetComponent<SlimeController>();
+    currentHealth = maxHealth;
   }
 
-  public void TakeDamage(int damage, Transform attacker)
+  public void Heal(int healing) => currentHealth += healing;
+
+  public void TakeDamage(int damage, Controller attacker)
   {
-    if (statsManager.Health <= 0)
+    currentHealth -= damage;
+
+    if (currentHealth <= 0)
     {
       controller.stateManager.ChangeState(new SlimeDeathState(controller, spriteRenderer));
-      Die(gameObject);
       return;
     }
-
-    controller.stateManager.ChangeState(new SlimeRunState(controller, slimeController, attacker));
 
     StartCoroutine(FlashRed());
 
     IEnumerator FlashRed()
     {
       spriteRenderer.color = Color.red;
-      yield return new WaitForSeconds(0.4f);
+      yield return invulnerabilityDuration;
       spriteRenderer.color = Color.white;
     }
   }
-
-  public void Heal(int healing) { }
 
   public void Die(GameObject g)
   {

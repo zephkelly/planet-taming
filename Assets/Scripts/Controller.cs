@@ -24,26 +24,23 @@ public class Controller : MonoBehaviour
   public Animator animator;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
-  public Image healthBarSlider; //Set manually
+  public Image healthBarSlider; //Set in inspector
 
-  public int health;
   public float walkSpeed;
   public int knockback;
   public int attackDamage;
   public bool isAttacking;
 
-  public int Health { get { return health; } }
-
   public float WalkSpeed { get { return walkSpeed; } }
-
   public int AttackDamage { get { return attackDamage; } }
-
+  public int Health { get { return statsManager.Health; } }
   public bool IsAttacking
   {
     get { return isAttacking; }
     set { isAttacking = value; }
   }
 
+  //Start our stats manager and controller that was designed for entity
   public void Init()
   {
     statsManager.Init(this, statsManager, entityStats, spriteRenderer);
@@ -52,12 +49,12 @@ public class Controller : MonoBehaviour
 
   public void Awake()
   {
-    navMeshAgent = GetComponent<NavMeshAgent>();
-    objectTransform = gameObject.GetComponent<Transform>();
-    rigid2D = GetComponent<Rigidbody2D>();
+    objectTransform = GetComponent<Transform>();
     spriteRenderer = GetComponent<SpriteRenderer>();
+    navMeshAgent = GetComponent<NavMeshAgent>();
     audioSource = GetComponent<AudioSource>();
     animator = GetComponent<Animator>();
+    rigid2D = GetComponent<Rigidbody2D>();
 
     controllerBlueprint = GetComponent<IController>();
     entityStats = GetComponent<IStats>();
@@ -65,11 +62,7 @@ public class Controller : MonoBehaviour
     Init();
   }
 
-  public void TakeDamage(int damage, Transform attacker)
-  {
-    statsManager.TakeDamage(damage, attacker);
-  }
-
+  public void TakeDamage(int damage, Controller attacker) => statsManager.TakeDamage(damage, attacker);
   public void Update() => stateManager.Update();
   public void FixedUpdate() => stateManager.FixedUpdate();
 }

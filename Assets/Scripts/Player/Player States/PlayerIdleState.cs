@@ -34,11 +34,6 @@ public class PlayerIdleState : IState
     currentIdleTimer -= Time.deltaTime;
   }
 
-  public void FixedUpdate()
-  {
-  }
-
-  public void Exit()
-  {
-  }
+  public void FixedUpdate() { }
+  public void Exit() { }
 }

@@ -33,4 +33,11 @@ public class StateManager
 
     currentState.FixedUpdate();
   }
+
+  public void ExitState()
+  {
+    if (currentState == null) return;
+
+    currentState.Exit();
+  }
 }

@@ -4,11 +4,10 @@ public class PlayerSprintState : IState
 {
   private Controller controller;
   private PlayerController playerController;
+
   private float walkSpeed;
   private float sprintSpeed;
-
   private float sprintLerp;
-
   private float finalSprintLerp;
 
   public PlayerSprintState(Controller c)
@@ -42,7 +41,5 @@ public class PlayerSprintState : IState
     playerController.rigid2D.AddForce(playerController.inputs.normalized * finalSprintLerp, ForceMode2D.Impulse);
   }
 
-  public void Exit()
-  {
-  }
+  public void Exit() { }
 }

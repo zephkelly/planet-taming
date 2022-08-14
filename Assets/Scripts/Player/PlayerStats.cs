@@ -6,20 +6,31 @@ public class PlayerStats : MonoBehaviour, IStats
 {
   private Controller playerController;
   private StatsManager statsManager;
+  
   private SpriteRenderer spriteRenderer;
 
-  public void Init(Controller c, StatsManager statsm, SpriteRenderer sr)
+  [SerializeField] int maxHealth = 100;
+  [SerializeField] int currentHealth;
+
+  public int MaxHealth() => maxHealth;
+  public int Health() => currentHealth;
+
+  public void Init(Controller c, StatsManager sm, SpriteRenderer sr)
   {
     playerController = c;
-    statsManager = statsm;
+    statsManager = sm;
     spriteRenderer = sr;
+
+    currentHealth = maxHealth;
   }
 
-  public void TakeDamage(int damage, Transform attacker)
+  public void Heal(int healing) => currentHealth += healing;
+  
+  public void TakeDamage(int damage, Controller attacker)
   {
-    statsManager.Health -= damage;
+    currentHealth -= damage;
 
-    if (statsManager.Health <= 0)
+    if (currentHealth <= 0)
     {
       Die(gameObject);
       return;
@@ -34,8 +45,6 @@ public class PlayerStats : MonoBehaviour, IStats
       spriteRenderer.color = Color.white;
     }
   }
-
-  public void Heal(int healing) { }
 
   public void Die(GameObject g)
   {

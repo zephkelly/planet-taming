@@ -8,7 +8,7 @@ public class SlimeJumpState : IState
   private Controller controller;
 
   private Vector3 lastJumpDirection;
-  private LayerMask collidablesLayerMask;
+  private static LayerMask collidablesLayerMask  = 1 << LayerMask.NameToLayer("Collidable");
 
   private float moveDirX, moveDirY;
   private float impulseStrength;
@@ -17,8 +17,6 @@ public class SlimeJumpState : IState
   {
     controller = c;
     slimeController = sc;
-
-    collidablesLayerMask = 1 << LayerMask.NameToLayer("Collidable");
   }
 
   public void Entry()
@@ -29,7 +27,7 @@ public class SlimeJumpState : IState
 
     Vector3 randomDirection = NearestOpenSpace();
     
-    controller.rigid2D.AddForce(randomDirection * slimeController.JumpStrength, ForceMode2D.Impulse);
+    //controller.rigid2D.AddForce(randomDirection * slimeController.JumpStrength, ForceMode2D.Impulse);
   }
 
   private Vector3 NearestOpenSpace()
@@ -67,7 +65,7 @@ public class SlimeJumpState : IState
     }
   }
 
-  public void FixedUpdate() {}
+  public void FixedUpdate() { }
   public void Exit()
   {
     controller.animator.SetBool("isJumping", false);

@@ -43,10 +43,7 @@ public class PlayerController : MonoBehaviour, IController
     animator = GetComponent<Animator>();
   }
 
-  public void Start()
-  {
-    stateManager.ChangeState(new PlayerIdleState(controller));
-  }
+  public void Start() => stateManager.ChangeState(new PlayerIdleState(controller));
 
   public void Update()
   {
@@ -93,7 +90,7 @@ public class PlayerController : MonoBehaviour, IController
     if (Input.GetKeyDown(KeyCode.H))
     {
       //Debug.Log("Damage player");
-      statsManager.TakeDamage(10, this.transform);
+      statsManager.TakeDamage(10, controller);
     }
   }
 

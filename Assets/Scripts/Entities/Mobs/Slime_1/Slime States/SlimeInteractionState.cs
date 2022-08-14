@@ -26,25 +26,22 @@ public class SlimeInteractionState : IState
 
   public SlimeInteractionState(Controller us, SlimeController sc, Controller friend, SlimeInteractionBehaviour slimeBehaviour)
   {
+    slimeController = sc;
     ourController = us;
     friendController = friend;
 
     ourInteractionBehaviour = slimeBehaviour;
-    slimeController = sc;
-
+    ourTransform = ourController.transform;
+    friendTransform = friendController.transform;
     slimeAnimator = ourController.animator;
     emoteAnimator = ourInteractionBehaviour.emoteAnimator;
-
-    isEmoting = false;
   }
 
   public void Entry()
   {
+    //We arent using an emote bubble yet
+    isEmoting = false;
     ourInteractionBehaviour.DisableEmote();
-
-    //Making sure were in the correct animation state
-    slimeAnimator.SetBool("isJumping", false);
-    slimeAnimator.SetBool("isRunning", false);
 
     //Random chance to use an emote bubble
     canEmote = Random.Range(0, 3) == 0 ? true : false;
@@ -56,9 +53,6 @@ public class SlimeInteractionState : IState
 
       timeTillEmote = Random.Range(3f, 5f);
     }
-
-    ourTransform = ourController.transform;
-    friendTransform = friendController.transform;
 
     //Calculating the distance between the two characters
     interactionLocation = (friendTransform.position + ourTransform.position) / 2;
