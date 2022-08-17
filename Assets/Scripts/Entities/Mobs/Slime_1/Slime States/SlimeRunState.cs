@@ -10,6 +10,9 @@ public class SlimeRunState : IState
     private Transform attackingEntity;
     private Vector3[] pathCorners;
 
+    private Vector3 directionFromEnemy;
+    private Vector3 nextPoint;
+    private Vector3 runDirection;
     private Vector3 steeringTarget;
 
     private float _runTime;
@@ -42,29 +45,27 @@ public class SlimeRunState : IState
     {
       if (_i >= pathCorners.Length) CalculatePath();
 
+      nextPoint = pathCorners[_i];
+      runDirection = nextPoint - controller.objectTransform.position;
+      runDirection.z = 0;
+
       if ((pathCorners[_i] - controller.objectTransform.position).magnitude < 0.1f) _i++;
 
-      if (_i >= pathCorners.Length) CalculatePath();
-
-      Vector3 nextPoint = pathCorners[_i];
-      Vector3 directionToPoint = nextPoint - controller.objectTransform.position;
-      directionToPoint.z = 0;
-
-      steeringTarget = directionToPoint.normalized;
+      steeringTarget = runDirection.normalized;
     }
 
     public void CalculatePath()
     {
       _i = 0;
 
-      Vector3 runDirection = controller.objectTransform.position - attackingEntity.position;
-      runDirection.Normalize();
+      directionFromEnemy = controller.objectTransform.position - attackingEntity.position;
+      directionFromEnemy.Normalize();
 
-      for(int i = 0; i < 10; i++)
+      for(int i = 0; i < 20; i++)
       {
         NavMesh.CalculatePath(
         controller.objectTransform.position,
-        controller.objectTransform.position + (runDirection * (slimeController.RunDistance + i)),
+        controller.objectTransform.position + (directionFromEnemy * (slimeController.RunDistance + i)),
         NavMesh.AllAreas,
         runPath);
 

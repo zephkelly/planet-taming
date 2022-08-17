@@ -24,7 +24,10 @@ public class SlimeJumpState : IState
     controller.animator.SetBool("isJumping", true);
 
     Vector3 randomPoint = Random.insideUnitCircle * slimeController.JumpRange;
-    Vector3 jumpDirection = controller.objectTransform.position + randomPoint;
+    Vector3 direction = controller.objectTransform.position + randomPoint;
+    slimeController.LastJumpDirection = direction;
+
+    Vector3 jumpDirection = (direction + slimeController.LastJumpDirection) / 2;
 
     controller.navMeshAgent.CalculatePath(jumpDirection, jumpPath);
     pathCorners = jumpPath.corners;

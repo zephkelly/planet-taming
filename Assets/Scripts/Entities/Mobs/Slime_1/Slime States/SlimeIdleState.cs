@@ -26,12 +26,15 @@ public class SlimeIdleState : IState
         return;
       }
 
-      int random = Random.Range(0, 5);
+      int random = Random.Range(0, 9);
 
       switch (random)
       {
         case 0:
           controller.stateManager.ChangeState(new SlimeExploreState(controller, slimeController));
+          break;
+        case 1:
+          controller.stateManager.ChangeState(new SlimeHomingState(controller, slimeController));
           break;
         default:
           controller.stateManager.ChangeState(new SlimeJumpState(controller, slimeController));
@@ -40,6 +43,6 @@ public class SlimeIdleState : IState
     }
 
     public void FixedUpdate() { }
-    
-    public void Exit() { }
+
+    public void Exit() {}
 }

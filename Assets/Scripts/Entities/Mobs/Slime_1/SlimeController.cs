@@ -13,6 +13,7 @@ public class SlimeController : MonoBehaviour, IController
   private CameraController cameraController;
   public Canvas healthBarCanvas; //Must set in inspector
   private Vector2 lastJumpDirection;
+  private Vector3 spawnPoint;
 
   private float invulnerabilityTimer;
 
@@ -20,18 +21,24 @@ public class SlimeController : MonoBehaviour, IController
   public float JumpRange { get { return 6; } }
   public float JumpStrength { get { return Random.Range(6f, 8f); } }
   public float JumpCooldown { get { return Random.Range(0.4f, 0.8f); } }
+
   public float ExploreRange { get { return 6; } }
   public float ExploreDuration { get { return 8f; } }
   public float ExploreJumpStrength { get { return Random.Range(2f, 4f); } }
   public float ExploreJumpCooldown { get { return Random.Range(1f, 2f); } }
-  public float RunDistance { get { return 5; } }
+
+  public float RunDistance { get { return 3; } }
   public float RunTime { get { return Random.Range(6f, 8f); } }
   public float RunJumpStrength { get { return Random.Range(18f, 20f); } }
   public float RunJumpCooldown { get { return Random.Range(0.3f, 0.7f); } }
-  public float KnockbackForce { get { return controller.knockback; } }
 
-  public Vector2 LastJumpDirection 
-  { 
+  //public float HomingThreshold { get { return 10; } }
+  public float HomingPointRange { get { return 5; } }
+  public float HomingJumpStrength { get { return Random.Range(1f, 12f); } }
+
+  public float KnockbackForce { get { return controller.knockback; } }
+  public Vector3 SpawnPoint { get { return spawnPoint; } }
+  public Vector3 LastJumpDirection { 
     get { return lastJumpDirection; }
     set { lastJumpDirection = value; } 
   }
@@ -50,6 +57,8 @@ public class SlimeController : MonoBehaviour, IController
     DisableHealthBar();
 
     stateManager.ChangeState(new SlimeIdleState(controller, this));
+
+    spawnPoint = controller.objectTransform.position;
 
 		controller.navMeshAgent.updateRotation = false;
 		controller.navMeshAgent.updateUpAxis = false;
