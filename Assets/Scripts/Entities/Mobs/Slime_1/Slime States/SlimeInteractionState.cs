@@ -44,7 +44,7 @@ public class SlimeInteractionState : IState
     ourInteractionBehaviour.DisableEmote();
 
     //Random chance to use an emote bubble
-    canEmote = Random.Range(0, 3) == 0 ? true : false;
+    canEmote = Random.Range(0, 4) == 0 ? true : false;
 
     if (canEmote)
     {

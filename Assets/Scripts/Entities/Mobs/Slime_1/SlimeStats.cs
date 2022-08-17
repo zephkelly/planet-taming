@@ -37,6 +37,8 @@ public class SlimeStats : MonoBehaviour, IStats
     {
       controller.stateManager.ChangeState(new SlimeDeathState(controller, spriteRenderer));
       return;
+    } else {
+      controller.stateManager.ChangeState(new SlimeKnockbackState(controller, slimeController, attacker));
     }
 
     StartCoroutine(FlashRed());

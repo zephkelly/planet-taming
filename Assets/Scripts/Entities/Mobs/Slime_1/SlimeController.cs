@@ -17,12 +17,19 @@ public class SlimeController : MonoBehaviour, IController
   private float invulnerabilityTimer;
 
   //Getters for states
-  public float KnockbackForce { get { return controller.knockback; } }
-  public float RunTime { get { return Random.Range(8f, 9f); } }
+  public float JumpRange { get { return 6; } }
+  public float JumpStrength { get { return Random.Range(6f, 8f); } }
+  public float JumpCooldown { get { return Random.Range(0.4f, 0.8f); } }
+  public float ExploreRange { get { return 6; } }
+  public float ExploreDuration { get { return 8f; } }
+  public float ExploreJumpStrength { get { return Random.Range(2f, 4f); } }
+  public float ExploreJumpCooldown { get { return Random.Range(1f, 2f); } }
   public float RunDistance { get { return 5; } }
-  public float ExploreDuration { get { return Random.Range(4f, 7f); } }
-  public float JumpStrength { get { return Random.Range(35f, 37f); } }
-  public float TimeTillNextJump { get { return Random.Range(0.4f, 0.8f); } }
+  public float RunTime { get { return Random.Range(6f, 8f); } }
+  public float RunJumpStrength { get { return Random.Range(18f, 20f); } }
+  public float RunJumpCooldown { get { return Random.Range(0.3f, 0.7f); } }
+  public float KnockbackForce { get { return controller.knockback; } }
+
   public Vector2 LastJumpDirection 
   { 
     get { return lastJumpDirection; }
@@ -67,8 +74,6 @@ public class SlimeController : MonoBehaviour, IController
     EnableHealthBar();
     statsManager.TakeDamage(enemy.AttackDamage, enemy);
     cameraController.InvokeShake(0.2f, 25, 1.25f, new Vector2(0.5f, 0.5f));
-    
-    stateManager.ChangeState(new SlimeKnockbackState(controller, this, enemy));
   }
 
   public void EnableHealthBar()

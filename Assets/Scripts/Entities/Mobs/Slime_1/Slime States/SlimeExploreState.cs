@@ -6,40 +6,97 @@ public class SlimeExploreState : IState
   private SlimeController slimeController;
   private Controller controller;
 
-  private Vector3 exploreDirection;
+  private NavMeshPath explorePath = new NavMeshPath();
 
-  //if the slime is stuck, we will exit after timer incase
-  private float exitTimer = 10f; 
+  private Vector3 exploreDestination;
+  private Vector3[] pathCorners;
+  private Vector3 currentPoint;
+  private Vector3 pointFromEntity;
+  private Vector3 moveDirection;
+
+  private float distanceToPoint;
+  private float jumpCooldown;
+  private float exitTimer;
+
+  internal int _i;
 
   public SlimeExploreState(Controller c, SlimeController sc)
   {
     controller = c;
     slimeController = sc;
+
+    exitTimer = slimeController.ExploreDuration;
   }
 
   public void Entry()
   {
-    Vector3 randomPosition = new Vector3(Random.Range(-6f, 6f), Random.Range(-6f, 6f), 0);
+    Vector3 randomPoint = Random.insideUnitCircle * slimeController.ExploreRange;
+    exploreDestination = controller.objectTransform.position + randomPoint;
 
-    controller.navMeshAgent.SetDestination(controller.objectTransform.position + randomPosition);
+    CalculatePath(0);
   }
 
   public void Update()
   {
-    ExploreTimer();
+    ExploreCountdown();
 
-    AreWeThereYet();
+    CalculateTrajectory();
 
-    exploreDirection = controller.navMeshAgent.steeringTarget - controller.objectTransform.position;
-    exploreDirection.Normalize(); 
+    if (HaveWeReachedPoint()) return;
+
+    PerformJump();  
   }
-  
-  public void FixedUpdate()
+
+  private void CalculatePath(int startingPoint)
   {
-    //controller.rigid2D.AddForce(exploreDirection * controller.WalkSpeed, ForceMode2D.Force);
+    controller.navMeshAgent.CalculatePath(exploreDestination, explorePath);
+    pathCorners = explorePath.corners;
+    _i = startingPoint;
   }
 
-  private void ExploreTimer()
+  private void CalculateTrajectory()
+  {
+    if (_i >= pathCorners.Length) 
+    {
+      controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
+      return;
+    }
+
+    currentPoint = pathCorners[_i];
+    currentPoint.z = 0;
+
+    pointFromEntity = currentPoint - controller.objectTransform.position;
+    pointFromEntity.z = 0;
+
+    distanceToPoint = pointFromEntity.magnitude;
+    moveDirection = pointFromEntity.normalized;
+  }
+
+  private bool HaveWeReachedPoint()
+  {
+    if (distanceToPoint <= 0.1f)
+    {
+      _i += 1;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void PerformJump()
+  {
+    jumpCooldown -= Time.deltaTime;
+
+    if (jumpCooldown > 0) return;
+
+    jumpCooldown = slimeController.ExploreJumpCooldown;   
+
+    controller.rigid2D.AddForce(moveDirection * slimeController.ExploreJumpStrength, ForceMode2D.Impulse);
+
+    CalculatePath(1);
+  }
+
+  private void ExploreCountdown()
   {
     exitTimer -= Time.deltaTime;
 
@@ -47,14 +104,10 @@ public class SlimeExploreState : IState
     controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
   }
 
-  private void AreWeThereYet()
+  public void FixedUpdate()
   {
-    if(controller.navMeshAgent.remainingDistance > 0.1f) return;
-    controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
+    controller.rigid2D.AddForce(moveDirection * (slimeController.ExploreJumpStrength * 0.8f), ForceMode2D.Force);
   }
-
-  public void Exit()
-  {
-    controller.navMeshAgent.ResetPath();
-  }
+  
+  public void Exit() { }
 }

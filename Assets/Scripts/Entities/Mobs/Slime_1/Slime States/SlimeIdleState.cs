@@ -34,12 +34,12 @@ public class SlimeIdleState : IState
           controller.stateManager.ChangeState(new SlimeExploreState(controller, slimeController));
           break;
         default:
-          Debug.Log("We would have jumped");
-          //controller.stateManager.ChangeState(new SlimeJumpState(controller, slimeController));
+          controller.stateManager.ChangeState(new SlimeJumpState(controller, slimeController));
           break;
       }
     }
 
     public void FixedUpdate() { }
+    
     public void Exit() { }
 }

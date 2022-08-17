@@ -28,31 +28,19 @@ public class SlimeKnockbackState : IState
 
     knockbackDirection = controller.objectTransform.position - enemyTransform.position;
     knockbackDirection.Normalize();
+
+    controller.rigid2D.AddForce(knockbackDirection * enemyController.knockback, ForceMode2D.Impulse);
   }
 
   public void Update()
   {
-    ShouldWeRun();
 
-    Vector2 velocityLerp = Vector2.Lerp(
-            knockbackDirection * enemyController.knockback,
-            Vector2.zero,
-            _lerpValue += (Time.deltaTime * 2.3f));
-
-    controller.navMeshAgent.velocity = velocityLerp;
-  }
-
-  private void ShouldWeRun()
-  {
-    if (_lerpValue < 1f) return;
-
+    if (controller.rigid2D.velocity.magnitude > 0.3f) return;
+    
     controller.stateManager.ChangeState(new SlimeRunState(controller, slimeController, enemyController));
-  }
+  }  
 
   public void FixedUpdate() { }
-  public void Exit() 
-  { 
-    controller.navMeshAgent.velocity = Vector2.zero;
-  }
+  public void Exit() { }
 }
 

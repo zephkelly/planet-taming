@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SlimeJumpState : IState
 {
   private SlimeController slimeController;
   private Controller controller;
 
-  private Vector3 lastJumpDirection;
-  private static LayerMask collidablesLayerMask  = 1 << LayerMask.NameToLayer("Collidable");
-
-  private float moveDirX, moveDirY;
-  private float impulseStrength;
+  private NavMeshPath jumpPath = new NavMeshPath();
+  
+  private Vector3[] pathCorners;
+  private Vector3 jumpDestination;
 
   public SlimeJumpState(Controller c, SlimeController sc)
   {
@@ -23,49 +23,38 @@ public class SlimeJumpState : IState
   {
     controller.animator.SetBool("isJumping", true);
 
-    lastJumpDirection = slimeController.LastJumpDirection;
+    Vector3 randomPoint = Random.insideUnitCircle * slimeController.JumpRange;
+    Vector3 jumpDirection = controller.objectTransform.position + randomPoint;
 
-    Vector3 randomDirection = NearestOpenSpace();
-    
-    //controller.rigid2D.AddForce(randomDirection * slimeController.JumpStrength, ForceMode2D.Impulse);
-  }
+    controller.navMeshAgent.CalculatePath(jumpDirection, jumpPath);
+    pathCorners = jumpPath.corners;
 
-  private Vector3 NearestOpenSpace()
-  {
-    Vector3 _rD = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
-
-    RaycastHit2D[] hits = Physics2D.CircleCastAll(controller.objectTransform.position, 2f, Vector2.zero, 0f, collidablesLayerMask);
-
-    for (int i = 0; i < hits.Length; i++)
+    foreach (Vector3 point in pathCorners)
     {
-      RaycastHit2D thisHit = hits[i];
-    
-      Vector2 normal = thisHit.normal;
-      float dot = Vector2.Dot(_rD, normal);
-
-      if (dot > 0.3 || dot > -0.3) {}
-      else { return _rD;} 
+      jumpDestination = point;
     }
 
-    return _rD;
+    if (jumpDestination == Vector3.zero)
+    {
+      controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
+    } else {
+
+      Vector3 directionToPoint = jumpDestination - controller.objectTransform.position;
+      directionToPoint.Normalize();
+
+      controller.rigid2D.AddForce(directionToPoint * slimeController.JumpStrength, ForceMode2D.Impulse);
+    }
   }
 
   public void Update()
   {
-    ShouldWeIdle();
-  }
+    if (controller.rigid2D.velocity.y > 0.1f) return;
 
-  private void ShouldWeIdle()
-  {
-    if (controller.rigid2D.velocity.magnitude < 0.1f)
-    {
-      controller.animator.SetBool("isJumping", false);
-  
-      controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
-    }
+    controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
   }
 
   public void FixedUpdate() { }
+  
   public void Exit()
   {
     controller.animator.SetBool("isJumping", false);
