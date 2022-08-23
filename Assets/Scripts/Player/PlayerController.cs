@@ -7,22 +7,21 @@ public class PlayerController : MonoBehaviour, IController
   public Controller controller;
   public StateManager stateManager;
   public StatsManager statsManager;
+  public PlayerAttack playerAttackScript;
+  public Inventory inventory;
+  
   private CameraController cameraController;
-
-  public Rigidbody2D rigid2D;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
+  public Rigidbody2D rigid2D;
   public Animator animator;
 
-  [SerializeField] private Collider2D weaponTrigger;
   [SerializeField] private GameObject slimePrefab;
   
   public Vector3 inputs;
   private Vector3 mousePos;
 
-  private float attackCooldownTimer;
-  private float invulnerabilityTimer;
-
+  [SerializeField] float invulnerabilityTimer;
   public bool isSprinting;
   public float sprintSpeed;
 
@@ -31,13 +30,24 @@ public class PlayerController : MonoBehaviour, IController
     controller = c;
     stateManager = sm;
     statsManager = hm;
+
+    inventory = new Inventory();
   }
 
   public void Awake()
   {
     rigid2D = controller.rigid2D;
     spriteRenderer = controller.spriteRenderer;
-    audioSource = controller.audioSource; 
+    audioSource = controller.audioSource;
+
+    playerAttackScript = GetComponent<PlayerAttack>();
+    
+    playerAttackScript.Init(
+      controller,
+      stateManager,
+      statsManager,
+      inventory
+    );
 
     controller = GetComponent<Controller>();
     animator = GetComponent<Animator>();
@@ -47,35 +57,14 @@ public class PlayerController : MonoBehaviour, IController
 
   public void Update()
   {
-    stateManager.Update();
+    //stateManager.Update();
     UpdateInputs();
 
     ModerationTools();
 
-    while(attackCooldownTimer > 0 || invulnerabilityTimer > 0)
+    while (invulnerabilityTimer > 0) 
     {
-      attackCooldownTimer -= Time.deltaTime;
       invulnerabilityTimer -= Time.deltaTime;
-    }
-
-    if (attackCooldownTimer > 0) return;
-
-    if(Input.GetMouseButton(0))
-    {
-      controller.IsAttacking = true;
-      attackCooldownTimer = 0.5f;
-
-      StartCoroutine(Attack());
-
-      IEnumerator Attack() 
-      {
-        weaponTrigger.enabled = true;
-
-        yield return new WaitForSeconds(0.2f);
-
-        weaponTrigger.enabled = false;
-        controller.IsAttacking = false;
-      }
     }
   }
 
