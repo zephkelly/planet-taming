@@ -38,10 +38,7 @@ public class SlimeController : MonoBehaviour, IController
 
   public float KnockbackForce { get { return controller.knockback; } }
   public Vector3 SpawnPoint { get { return spawnPoint; } }
-  public Vector3 LastJumpDirection { 
-    get { return lastJumpDirection; }
-    set { lastJumpDirection = value; } 
-  }
+  public Vector3 LastJumpDirection { get { return lastJumpDirection; } set { lastJumpDirection = value; } }
 
   public void Init(Controller c, StateManager sm, StatsManager statsm)
   {
@@ -54,30 +51,29 @@ public class SlimeController : MonoBehaviour, IController
 
   public void Start()
   {
+		controller.navMeshAgent.updateRotation = false;
+		controller.navMeshAgent.updateUpAxis = false;
+    spawnPoint = controller.objectTransform.position;
+
     DisableHealthBar();
 
     stateManager.ChangeState(new SlimeIdleState(controller, this));
-
-    spawnPoint = controller.objectTransform.position;
-
-		controller.navMeshAgent.updateRotation = false;
-		controller.navMeshAgent.updateUpAxis = false;
   }
 
   public void Update()
   {
-    if (invulnerabilityTimer >= 0) invulnerabilityTimer -= Time.deltaTime;
+    while (invulnerabilityTimer > 0) invulnerabilityTimer -= Time.deltaTime;
   }
 
   public void OnTriggerEnter2D(Collider2D collider)
   {
+    if (!collider.CompareTag("Weapon")) return;
     if (invulnerabilityTimer > 0) return;
-    if (!collider.TryGetComponent(out Controller c)) return;
-    
-    Controller enemy = c;
+
+    Controller enemy = collider.GetComponentInParent<Controller>();
 
     if (!enemy.IsAttacking) return;
-    
+
     invulnerabilityTimer = 0.5f;
 
     EnableHealthBar();
@@ -88,7 +84,6 @@ public class SlimeController : MonoBehaviour, IController
   public void EnableHealthBar()
   {
     healthBarCanvas.enabled = true;
-
     StartCoroutine(HideHealthbarCoroutine(20f));
 
     IEnumerator HideHealthbarCoroutine(float seconds)
@@ -98,5 +93,8 @@ public class SlimeController : MonoBehaviour, IController
     }
   }
 
-  public void DisableHealthBar() => healthBarCanvas.enabled = false;
+  public void DisableHealthBar()
+  {
+    healthBarCanvas.enabled = false;
+  }
 }

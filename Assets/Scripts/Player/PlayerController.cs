@@ -17,11 +17,11 @@ public class PlayerController : MonoBehaviour, IController
   public Animator animator;
 
   [SerializeField] private GameObject slimePrefab;
+  [SerializeField] float invulnerabilityTimer;
   
   public Vector3 inputs;
   private Vector3 mousePos;
 
-  [SerializeField] float invulnerabilityTimer;
   public bool isSprinting;
   public float sprintSpeed;
 
@@ -39,21 +39,19 @@ public class PlayerController : MonoBehaviour, IController
     rigid2D = controller.rigid2D;
     spriteRenderer = controller.spriteRenderer;
     audioSource = controller.audioSource;
+    animator = controller.animator;
 
     playerAttackScript = GetComponent<PlayerAttack>();
     
-    playerAttackScript.Init(
-      controller,
-      stateManager,
-      statsManager,
-      inventory
-    );
+    playerAttackScript.Init(controller, stateManager, statsManager, inventory);
 
-    controller = GetComponent<Controller>();
-    animator = GetComponent<Animator>();
+    //controller = GetComponent<Controller>();
   }
 
-  public void Start() => stateManager.ChangeState(new PlayerIdleState(controller));
+  public void Start()
+  {
+    stateManager.ChangeState(new PlayerIdleState(controller));
+  }
 
   public void Update()
   {

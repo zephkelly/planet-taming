@@ -34,18 +34,7 @@ public class Controller : MonoBehaviour
   public float WalkSpeed { get { return walkSpeed; } }
   public int AttackDamage { get { return attackDamage; } }
   public int Health { get { return statsManager.Health; } }
-  public bool IsAttacking
-  {
-    get { return isAttacking; }
-    set { isAttacking = value; }
-  }
-
-  //Start our stats manager and controller that was designed for entity
-  public void Init()
-  {
-    statsManager.Init(this, statsManager, entityStats, spriteRenderer);
-    controllerBlueprint.Init(this, stateManager, statsManager);
-  }
+  public bool IsAttacking { get { return isAttacking; } set { isAttacking = value; } }
 
   public void Awake()
   {
@@ -62,8 +51,14 @@ public class Controller : MonoBehaviour
     Init();
   }
 
+  //Start our stats manager and controller that was designed for entity
+  public void Init()
+  {
+    statsManager.Init(this, statsManager, entityStats, spriteRenderer);
+    controllerBlueprint.Init(this, stateManager, statsManager);
+  }
+
   public void TakeDamage(int damage, Controller attacker) => statsManager.TakeDamage(damage, attacker);
   public void Update() => stateManager.Update();
   public void FixedUpdate() => stateManager.FixedUpdate();
 }
-
