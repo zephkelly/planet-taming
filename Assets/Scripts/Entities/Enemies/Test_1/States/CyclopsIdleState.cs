@@ -15,7 +15,6 @@ public class CyclopsIdleState : IState
 
   public void Entry()
   {
-    Debug.Log("CyclopsIdleState Entry");
   }
 
   public void Update()

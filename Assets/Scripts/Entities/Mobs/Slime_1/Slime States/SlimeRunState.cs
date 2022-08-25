@@ -22,6 +22,8 @@ public class SlimeRunState : IState
     private float _runTime;
     private float _jumpCountdown;
 
+    private float redirectForce = 8f;
+
     private int pathIterator;
 
     public SlimeRunState(Controller c, SlimeController sc, Controller t)
@@ -43,6 +45,21 @@ public class SlimeRunState : IState
     {
       CountdownTimer();
       SteeringTarget();
+
+      //Shoot a raycast to see if we are going to run into any entities
+      RaycastHit2D[] hits = new RaycastHit2D[3];
+      hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.6f, steeringTarget, 1.5f, 1 << LayerMask.NameToLayer("Entity"));
+
+      foreach (RaycastHit2D entity in hits)
+      {
+        if (entity.collider.gameObject == controller.gameObject) continue;
+        
+        Debug.Log("Hitting something");
+
+        //Add force in towards the steering target reflected by the normal of the hit entity
+        Vector2 hitNormal = entity.normal;
+        controller.rigid2D.AddForce(Vector2.Reflect(steeringTarget, hitNormal) * redirectForce, ForceMode2D.Force);
+      }
 
       //Increase resolution of path calculation
       if (calculatePathTimer > 0)
