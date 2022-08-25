@@ -14,7 +14,9 @@ public class SlimeHomingState : IState
     private Vector3 runDirection;
     private Vector3 steeringTarget;
 
-    private int _i;
+    private float redirectForce = 4f;
+
+    private int pathIterator;
 
     public SlimeHomingState(Controller c, SlimeController sc)
     {
@@ -25,7 +27,7 @@ public class SlimeHomingState : IState
     public void Entry()
     {
       spawnPoint = slimeController.SpawnPoint;
-      _i = 0;
+      pathIterator = 0;
 
       CalculatePath();
     }
@@ -33,21 +35,37 @@ public class SlimeHomingState : IState
     public void Update()
     {
       SteeringTarget();
+
+      //Shoot a raycast to see if we are going to run into any entities
+      RaycastHit2D[] hits = new RaycastHit2D[3];
+      hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.35f, steeringTarget, 1.5f, 1 << LayerMask.NameToLayer("Entity"));
+
+      foreach (RaycastHit2D entity in hits)
+      {
+        if (entity.collider.gameObject == controller.gameObject) continue;
+        
+        Debug.Log("Hitting something");
+
+        //Add force in towards the steering target reflected by the normal of the hit entity
+        Vector2 hitNormal = entity.normal;
+        controller.rigid2D.AddForce(Vector2.Reflect(steeringTarget, hitNormal) * redirectForce, ForceMode2D.Force);
+      }
+
     }
 
     private void SteeringTarget()
     {
-      if (_i >= pathCorners.Length) 
+      if (pathIterator >= pathCorners.Length) 
       {
         controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
         return;
       }
 
-      nextPoint = pathCorners[_i];
+      nextPoint = pathCorners[pathIterator];
       runDirection = nextPoint - controller.objectTransform.position;
       runDirection.z = 0;
 
-      if ((pathCorners[_i] - controller.objectTransform.position).magnitude < 0.1f) _i++;
+      if ((pathCorners[pathIterator] - controller.objectTransform.position).magnitude < 0.1f) pathIterator++;
 
       steeringTarget = runDirection.normalized;
     }

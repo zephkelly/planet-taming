@@ -10,7 +10,7 @@ public class SlimeRunState : IState
 
     private NavMeshPath runPath = new NavMeshPath();
     private Transform attackingEntity;
-    private Vector3[] pathCorners;
+    private Vector3[] pathCorners = new Vector3[3];
 
     private Vector3 directionFromEnemy;
     private Vector3 nextPoint;
@@ -48,13 +48,11 @@ public class SlimeRunState : IState
 
       //Shoot a raycast to see if we are going to run into any entities
       RaycastHit2D[] hits = new RaycastHit2D[3];
-      hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.6f, steeringTarget, 1.5f, 1 << LayerMask.NameToLayer("Entity"));
+      hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.4f, steeringTarget, 1.5f, 1 << LayerMask.NameToLayer("Entity"));
 
       foreach (RaycastHit2D entity in hits)
       {
         if (entity.collider.gameObject == controller.gameObject) continue;
-        
-        Debug.Log("Hitting something");
 
         //Add force in towards the steering target reflected by the normal of the hit entity
         Vector2 hitNormal = entity.normal;
@@ -92,7 +90,7 @@ public class SlimeRunState : IState
       directionFromEnemy = controller.objectTransform.position - attackingEntity.position;
       directionFromEnemy.Normalize();
 
-      for(int i = 0; i < 20; i++)
+      for(int i = 0; i < 15; i++)
       {
         NavMesh.CalculatePath(
         controller.objectTransform.position,

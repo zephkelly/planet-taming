@@ -18,7 +18,9 @@ public class SlimeExploreState : IState
   private float jumpCooldown;
   private float exitTimer;
 
-  internal int _i;
+  private float redirectForce = 4f;
+
+  internal int pathIterator;
 
   public SlimeExploreState(Controller c, SlimeController sc)
   {
@@ -44,25 +46,40 @@ public class SlimeExploreState : IState
 
     if (HaveWeReachedPoint()) return;
 
-    PerformJump();  
+    PerformJump();
+
+    //Shoot a raycast to see if we are going to run into any entities
+    RaycastHit2D[] hits = new RaycastHit2D[3];
+    hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.45f, moveDirection, 0.1f, 1 << LayerMask.NameToLayer("Entity"));
+
+    foreach (RaycastHit2D entity in hits)
+    {
+      if (entity.collider.gameObject == controller.gameObject) continue;
+
+      Debug.Log("Hit " + entity.collider.gameObject.name);
+
+      //Add force in towards the steering target reflected by the normal of the hit entity
+      Vector2 hitNormal = entity.normal;
+      controller.rigid2D.AddForce(Vector2.Reflect(moveDirection, hitNormal) * redirectForce, ForceMode2D.Force);
+    }
   }
 
   private void CalculatePath(int startingPoint)
   {
     controller.navMeshAgent.CalculatePath(exploreDestination, explorePath);
     pathCorners = explorePath.corners;
-    _i = startingPoint;
+    pathIterator = startingPoint;
   }
 
   private void CalculateTrajectory()
   {
-    if (_i >= pathCorners.Length) 
+    if (pathIterator >= pathCorners.Length) 
     {
       controller.stateManager.ChangeState(new SlimeIdleState(controller, slimeController));
       return;
     }
 
-    currentPoint = pathCorners[_i];
+    currentPoint = pathCorners[pathIterator];
     currentPoint.z = 0;
 
     pointFromEntity = currentPoint - controller.objectTransform.position;
@@ -76,9 +93,10 @@ public class SlimeExploreState : IState
   {
     if (distanceToPoint <= 0.1f)
     {
-      _i += 1;
+      pathIterator += 1;
       return true;
-    } else {
+    } 
+    else {
       return false;
     }
   }

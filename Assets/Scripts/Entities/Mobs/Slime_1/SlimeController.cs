@@ -19,7 +19,7 @@ public class SlimeController : MonoBehaviour, IController
 
   //Getters for states
   public float JumpRange { get { return 6; } }
-  public float JumpStrength { get { return Random.Range(6f, 8f); } }
+  public float JumpStrength { get { return Random.Range(8f, 10f); } }
   public float JumpCooldown { get { return Random.Range(0.4f, 0.8f); } }
 
   public float ExploreRange { get { return 6; } }
