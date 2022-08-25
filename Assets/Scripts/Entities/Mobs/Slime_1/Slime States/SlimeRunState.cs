@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,10 +17,12 @@ public class SlimeRunState : IState
     private Vector3 runDirection;
     private Vector3 steeringTarget;
 
+    private const float calculateFrequency = 0.2f;
+    private float calculatePathTimer;
     private float _runTime;
     private float _jumpCountdown;
 
-    private int _i;
+    private int pathIterator;
 
     public SlimeRunState(Controller c, SlimeController sc, Controller t)
     {
@@ -39,24 +43,34 @@ public class SlimeRunState : IState
     {
       CountdownTimer();
       SteeringTarget();
+
+      //Increase resolution of path calculation
+      if (calculatePathTimer > 0)
+      {
+        calculatePathTimer -= Time.deltaTime;
+      }
+      else {
+        calculatePathTimer = calculateFrequency;
+        CalculatePath();
+      }
     }
 
     private void SteeringTarget()
     {
-      if (_i >= pathCorners.Length) CalculatePath();
+      if (pathIterator >= pathCorners.Length) CalculatePath();
 
-      nextPoint = pathCorners[_i];
+      nextPoint = pathCorners[pathIterator];
       runDirection = nextPoint - controller.objectTransform.position;
       runDirection.z = 0;
 
-      if ((pathCorners[_i] - controller.objectTransform.position).magnitude < 0.1f) _i++;
+      if ((pathCorners[pathIterator] - controller.objectTransform.position).magnitude < 0.1f) pathIterator++;
 
       steeringTarget = runDirection.normalized;
     }
 
     public void CalculatePath()
     {
-      _i = 0;
+      pathIterator = 0;
 
       directionFromEnemy = controller.objectTransform.position - attackingEntity.position;
       directionFromEnemy.Normalize();
@@ -87,7 +101,7 @@ public class SlimeRunState : IState
 
     public void FixedUpdate()
     {
-      controller.rigid2D.AddForce(steeringTarget * slimeController.RunJumpStrength, ForceMode2D.Force);
+      controller.rigid2D.AddForce(steeringTarget * slimeController.RunJumpStrength, ForceMode2D.Impulse);
     }
 
     public void Exit()

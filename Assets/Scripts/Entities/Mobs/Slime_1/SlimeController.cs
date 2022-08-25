@@ -29,7 +29,7 @@ public class SlimeController : MonoBehaviour, IController
 
   public float RunDistance { get { return 3; } }
   public float RunTime { get { return Random.Range(6f, 8f); } }
-  public float RunJumpStrength { get { return Random.Range(18f, 20f); } }
+  public float RunJumpStrength { get { return Random.Range(0.8f, 1.2f); } }
   public float RunJumpCooldown { get { return Random.Range(0.3f, 0.7f); } }
 
   //public float HomingThreshold { get { return 10; } }

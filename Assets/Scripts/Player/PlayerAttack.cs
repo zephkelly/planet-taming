@@ -41,7 +41,7 @@ public class PlayerAttack : MonoBehaviour
 
     if (attackTimer > 0) return;
 
-    if (Input.GetMouseButton(0))
+    if (Input.GetMouseButtonDown(0))
     {
       controller.IsAttacking = true;
 

@@ -16,7 +16,7 @@ public class PlayerSwordBehaviour : MonoBehaviour
   
   public void Swing()
   {
-    Debug.Log("Swing");
+    //Debug.Log("Swing");
   }
 
   public void Update()

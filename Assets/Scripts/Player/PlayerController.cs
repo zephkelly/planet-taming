@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour, IController
   public PlayerAttack playerAttackScript;
   public Inventory inventory;
   
-  private CameraController cameraController;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
   public Rigidbody2D rigid2D;
@@ -44,8 +43,6 @@ public class PlayerController : MonoBehaviour, IController
     playerAttackScript = GetComponent<PlayerAttack>();
     
     playerAttackScript.Init(controller, stateManager, statsManager, inventory);
-
-    //controller = GetComponent<Controller>();
   }
 
   public void Start()

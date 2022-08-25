@@ -35,7 +35,7 @@ public class SlimeKnockbackState : IState
   public void Update()
   {
 
-    if (controller.rigid2D.velocity.magnitude > 0.3f) return;
+    if (controller.rigid2D.velocity.magnitude > 0.5f) return;
     
     controller.stateManager.ChangeState(new SlimeRunState(controller, slimeController, enemyController));
   }  
