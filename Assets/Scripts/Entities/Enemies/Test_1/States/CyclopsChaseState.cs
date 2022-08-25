@@ -9,29 +9,30 @@ public class CyclopsChaseState : IState
   private Controller controller;
 
   private NavMeshPath runPath = new NavMeshPath();
-  private Transform entity;
-  private Vector3[] pathCorners;
+  private Transform preyEntity;
+  private Vector3[] pathCorners = new Vector3[3];
 
-  private Vector3 directionFromEnemy;
   private Vector3 nextPoint;
   private Vector3 runDirection;
   private Vector3 steeringTarget;
 
-  private float _runTime = 20f;
-  private float _jumpCountdown;
+  private const float calculateFrequency = 0.05f;
+  private float calculatePathTimer;
+  private float chaseTimer;
 
-  private int _i;
+  private int pathIterator;
 
   public CyclopsChaseState(Controller c, CyclopsController cc, Transform t)
   {
     controller = c;
     cyclopsController = cc;
-    entity = t;
+    preyEntity = t;
   }
 
   public void Entry()
   {
-    //controller.animator.SetBool("isRunning", true);
+    cyclopsController.IsChasing = true;
+    chaseTimer = cyclopsController.ChaseTime;
 
     CalculatePath();
   }
@@ -40,42 +41,67 @@ public class CyclopsChaseState : IState
   {
     CountdownTimer();
     SteeringTarget();
+
+    if (WithinChargingRange()) 
+    {
+      controller.stateManager.ChangeState(new CyclopsTelegraphState(controller, cyclopsController, preyEntity));
+    }
+
+    if (GiveUpChase())
+    {
+      controller.stateManager.ChangeState(new CyclopsIdleState(controller, cyclopsController));
+    }
+
+    //Increase resolution of path calculation
+    if (calculatePathTimer > 0)
+    {
+      calculatePathTimer -= Time.deltaTime;
+    }
+    else {
+      calculatePathTimer = calculateFrequency;
+      CalculatePath();
+    }
+
+    cyclopsController.EntityCollisionDetection(steeringTarget, 8f);
   }
 
   private void SteeringTarget()
   {
-    if (_i >= pathCorners.Length) CalculatePath();
+    if (pathIterator >= pathCorners.Length) CalculatePath();
 
-    nextPoint = pathCorners[_i];
+    nextPoint = pathCorners[pathIterator];
     runDirection = nextPoint - controller.objectTransform.position;
     runDirection.z = 0;
 
-    if ((pathCorners[_i] - controller.objectTransform.position).magnitude < 0.1f) _i++;
+    if ((pathCorners[pathIterator] - controller.objectTransform.position).magnitude < 0.2f) pathIterator++;
 
     steeringTarget = runDirection.normalized;
   }
 
   public void CalculatePath()
   {
-    _i = 0;
+    pathIterator = 0;
 
-    directionFromEnemy = entity.position - controller.objectTransform.position;
-    directionFromEnemy.Normalize();
-
-    NavMesh.CalculatePath(
-      controller.objectTransform.position,
-      entity.position,
-      NavMesh.AllAreas,
-      runPath);
+    controller.navMeshAgent.CalculatePath(preyEntity.position, runPath);
     
     pathCorners = runPath.corners;
   }
 
+  private bool GiveUpChase()
+  {
+    return Vector3.Distance(controller.objectTransform.position, preyEntity.position) > cyclopsController.ChaseMaxDistance;
+  }
+
+  private bool WithinChargingRange()
+  {
+    return Vector3.Distance(controller.objectTransform.position, preyEntity.position) < cyclopsController.ChargingRange;
+  }
+
   public void CountdownTimer()
   {
-    while (_runTime > 0)
+    while (chaseTimer > 0)
     {
-      _runTime -= Time.deltaTime;
+      chaseTimer -= Time.deltaTime;
       return;
     }
     controller.stateManager.ChangeState(new CyclopsIdleState(controller, cyclopsController));
@@ -83,11 +109,11 @@ public class CyclopsChaseState : IState
 
   public void FixedUpdate()
   {
-    controller.rigid2D.AddForce(steeringTarget * controller.walkSpeed, ForceMode2D.Impulse);
+    controller.rigid2D.AddForce(steeringTarget * cyclopsController.ChaseSpeed, ForceMode2D.Impulse);
   }
 
   public void Exit()
   {
-    //controller.animator.SetBool("isRunning", false);
+
   }
 }

@@ -15,6 +15,7 @@ public class CyclopsIdleState : IState
 
   public void Entry()
   {
+    cyclopsController.IsChasing = false;
   }
 
   public void Update()
