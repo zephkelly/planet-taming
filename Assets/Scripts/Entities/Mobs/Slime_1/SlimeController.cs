@@ -45,9 +45,8 @@ public class SlimeController : MonoBehaviour, IController
     controller = c;
     stateManager = sm;
     statsManager = statsm;
+    cameraController = Camera.main.GetComponent<CameraController>();
   }
-
-  public void Awake() => cameraController = Camera.main.GetComponent<CameraController>();
 
   public void Start()
   {

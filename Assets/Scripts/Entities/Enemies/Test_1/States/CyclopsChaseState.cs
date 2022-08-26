@@ -94,7 +94,12 @@ public class CyclopsChaseState : IState
 
   private bool WithinChargingRange()
   {
-    return Vector3.Distance(controller.objectTransform.position, preyEntity.position) < cyclopsController.ChargingRange;
+    if (Vector3.Distance(controller.objectTransform.position, preyEntity.position) > cyclopsController.StartChargeRange) return false;
+    if (Vector3.Distance(controller.objectTransform.position, preyEntity.position) < cyclopsController.MinChargeDistance) return false;
+
+    return true;
+  
+    //return Vector3.Distance(controller.objectTransform.position, preyEntity.position) < cyclopsController.StartChargeRange;
   }
 
   public void CountdownTimer()

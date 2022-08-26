@@ -9,19 +9,22 @@ public class CyclopsController : MonoBehaviour, IController
   private StateManager stateManager;
 
   [SerializeField] Canvas healthBarCanvas; //set in inspector
+
   private CameraController cameraController;
+  private LayerMask entityLayerMask;
   
   private float invulnerabilityTimer;
-
   private bool isChasing;
 
-  public float ChaseRange { get { return 8f; } }
+  public float StartChaseRange { get { return 8f; } }
   public float ChaseSpeed { get { return 1.8f; } }
   public float ChaseTime { get { return 15f; } }
   public float ChaseMaxDistance { get { return 15f; } }
-  public float ChargingRange { get { return 4f; } }
-  public float ChargeForce { get { return 80f; } }
-  public float TelegraphTime { get { return 1f; } }
+  public float StartChargeRange { get { return 5f; } }
+  public float MaxChargeDistance { get { return 6f; } }
+  public float MinChargeDistance { get { return 4f; } }
+  public float ChargeForce { get { return 12f; } }
+  public float TelegraphTime { get { return 0.4f; } }
   public bool IsChasing { get { return isChasing; } set { isChasing = value; } } 
 
   public void Init(Controller c, StateManager sm, StatsManager hm)
@@ -34,6 +37,7 @@ public class CyclopsController : MonoBehaviour, IController
   public void Awake()
   {
     cameraController = Camera.main.GetComponent<CameraController>();
+    entityLayerMask = 1 << LayerMask.NameToLayer("Entity");
   }
 
   public void Start()
@@ -53,7 +57,7 @@ public class CyclopsController : MonoBehaviour, IController
     if (!isChasing)
     {
       //shoot a circle cast around cyclops to see if player is in range
-      var hits = Physics2D.CircleCastAll(controller.objectTransform.position, ChaseRange, Vector2.zero, 0, 1 << LayerMask.NameToLayer("Entity"));
+      var hits = Physics2D.CircleCastAll(controller.objectTransform.position, StartChaseRange, Vector2.zero, 0, 1 << LayerMask.NameToLayer("Entity"));
 
       foreach (var hit in hits)
       {
@@ -76,15 +80,15 @@ public class CyclopsController : MonoBehaviour, IController
     invulnerabilityTimer = 0.5f;
 
     EnableHealthBar();
-    //statsManager.TakeDamage(enemy.AttackDamage, enemy);
-    cameraController.InvokeShake(0.2f, 25, 1.25f, new Vector2(0.5f, 0.5f));
+    statsManager.TakeDamage(enemy.AttackDamage, enemy);
+    cameraController.InvokeShake(0.4f, 25, 1.25f, new Vector2(0.5f, 0.5f));
   }
 
   public void EntityCollisionDetection(Vector3 steeringTarget, float redirectForce)
   {
     //Shoot a raycast to see if we are going to run into any entities
     RaycastHit2D[] hits = new RaycastHit2D[2];
-    hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.35f, steeringTarget, 1.3f, 1 << LayerMask.NameToLayer("Entity"));
+    hits = Physics2D.CircleCastAll(controller.objectTransform.position, 0.35f, steeringTarget, 1.3f, entityLayerMask);
 
     foreach (RaycastHit2D entity in hits)
     {

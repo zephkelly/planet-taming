@@ -30,7 +30,7 @@ public class PlayerMoveState : IState
 
   public void FixedUpdate()
   {
-    playerController.rigid2D.AddForce(playerController.inputs.normalized * playerController.controller.WalkSpeed, ForceMode2D.Impulse);
+    playerController.rigid2D.AddForce(playerController.inputs.normalized * controller.WalkSpeed, ForceMode2D.Force);
   }
 
   public void Exit() { }

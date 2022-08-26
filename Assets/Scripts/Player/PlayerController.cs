@@ -10,19 +10,25 @@ public class PlayerController : MonoBehaviour, IController
   public PlayerAttack playerAttackScript;
   public Inventory inventory;
   
+  public CameraController cameraController;
   public SpriteRenderer spriteRenderer;
   public AudioSource audioSource;
   public Rigidbody2D rigid2D;
   public Animator animator;
 
   [SerializeField] private GameObject slimePrefab;
-  [SerializeField] float invulnerabilityTimer;
+  [SerializeField] private GameObject cyclopsPrefab;
   
   public Vector3 inputs;
   private Vector3 mousePos;
 
+  private float invulnerabilityTimer;
+  [SerializeField] private float invulnerabilityPeriod;
+  [SerializeField] float attackCooldown;
   public bool isSprinting;
   public float sprintSpeed;
+
+  public float AttackCooldown { get { return attackCooldown; } }
 
   public void Init(Controller c, StateManager sm, StatsManager hm)
   {
@@ -31,6 +37,7 @@ public class PlayerController : MonoBehaviour, IController
     statsManager = hm;
 
     inventory = new Inventory();
+    cameraController = Camera.main.GetComponent<CameraController>();
   }
 
   public void Awake()
@@ -75,7 +82,27 @@ public class PlayerController : MonoBehaviour, IController
     {
       //Debug.Log("Damage player");
       statsManager.TakeDamage(10, controller);
+      invulnerabilityTimer = invulnerabilityPeriod;
     }
+
+    if (Input.GetKeyDown(KeyCode.E))
+    {
+      //Debug.Log("Heal player");
+      Instantiate(cyclopsPrefab, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
+    }
+  }
+
+  public void OnCollisionEnter2D(Collision2D collision) 
+  {
+    if (!collision.collider.CompareTag("Enemy")) return;
+    if (invulnerabilityTimer > 0) return;
+
+    Controller enemy = collision.collider.GetComponentInParent<Controller>();
+
+    invulnerabilityTimer = 0.5f;
+
+    statsManager.TakeDamage(enemy.AttackDamage, enemy);
+    cameraController.InvokeShake(0.2f, 25, 1.25f, new Vector2(0.5f, 0.5f));
   }
 
   public void UpdateInputs()
@@ -92,6 +119,4 @@ public class PlayerController : MonoBehaviour, IController
     animator.SetFloat("lastX", inputs.x);
     animator.SetFloat("lastY", inputs.y);
   }
-
-  public void ResetIdle() => stateManager.ChangeState(new PlayerIdleState(controller));
 }

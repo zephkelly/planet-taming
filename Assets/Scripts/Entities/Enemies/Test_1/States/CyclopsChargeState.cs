@@ -22,7 +22,11 @@ public class CyclopsChargeState : IState
     var directionToCharge = preyEntity.position - controller.objectTransform.position;
     directionToCharge.Normalize();
 
-    controller.rigid2D.AddForce(directionToCharge * cyclopsController.ChargeForce, ForceMode2D.Impulse);
+    //A little bit of a hack to make the charge feel more natural, distance influences charge strength
+    var distanceToEntity = Vector3.Distance(controller.objectTransform.position, preyEntity.position);
+    float chargeDistanceMultiplier = cyclopsController.ChargeForce * Mathf.Clamp(distanceToEntity, 0, cyclopsController.MaxChargeDistance);
+
+    controller.rigid2D.AddForce(directionToCharge * chargeDistanceMultiplier, ForceMode2D.Impulse);
   }
 
   public void Update()
