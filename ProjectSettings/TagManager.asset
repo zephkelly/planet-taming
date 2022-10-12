@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  - PersistentManager
+  - Mob
+  - Emote
+  - Slime
+  - Collidable
+  - Entity
+  - Weapon
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Slime
+  - Water
+  - UI
+  - Collidable
+  - Entity
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Environment
+    uniqueID: 3110747613
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Interactables
+    uniqueID: 2977667559
+    locked: 0
